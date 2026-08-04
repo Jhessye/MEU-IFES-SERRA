@@ -1,5 +1,5 @@
 from extensions import db
-from base import BaseModel
+from backend.model.base import BaseModel
 
 class Usuario(BaseModel):
     __tablename__ = "usuarios"

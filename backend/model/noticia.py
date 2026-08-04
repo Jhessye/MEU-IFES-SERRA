@@ -1,4 +1,4 @@
-from base import BaseModel
+from backend.model.base import BaseModel
 from extensions import db
 
 
