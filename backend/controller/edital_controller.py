@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request
 from services import edital_service
 
-edital_bp = Blueprint('edital', __name__, url_prefix='/autores')
+edital_bp = Blueprint('edital', __name__, url_prefix='/edital')
 
 @edital_bp.route('/', methods=['GET'])
 def listar_editais():
