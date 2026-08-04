@@ -7,9 +7,9 @@ def listar_editais():
 
 def criar_edital(data):
     novo_edital = Edital(
-        titulo=data.get("titulo"),
-        link=data.get("link"),
-        texto=data.get("texto")
+        titulo=data["titulo"],
+        link=data["link"],
+        texto=data["texto"]
     )
     if not novo_edital.titulo or not novo_edital.link or not novo_edital.texto:
         return None #dados incompletos

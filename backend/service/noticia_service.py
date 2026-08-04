@@ -7,10 +7,10 @@ def listar_noticias():
 
 def criar_noticia(data):
     nova_noticia = Noticia(
-        titulo=data.get("titulo"),
-        autor=data.get("autor"),
-        data=data.get("data"),
-        texto=data.get("texto"),
+        titulo=data["titulo"],
+        autor=data["autor"],
+        data=data["data"],
+        texto=data["texto"],
         imagem=data.get("imagem")
     )
     if not nova_noticia.titulo or not nova_noticia.autor or not nova_noticia.data or not nova_noticia.texto:

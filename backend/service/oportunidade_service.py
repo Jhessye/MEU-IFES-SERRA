@@ -7,10 +7,10 @@ def listar_oportunidades():
 
 def criar_oportunidade(data):
     nova_oportunidade = Oportunidade(
-        titulo=data.get("titulo"),
-        cargaHoraria=data.get("cargaHoraria"),
-        requisitos=data.get("requisitos"),
-        observacoes=data.get("observacoes")
+        titulo=data["titulo"],
+        cargaHoraria=data["cargaHoraria"],
+        requisitos=data["requisitos"],
+        observacoes=data["observacoes"]
     )
     if not nova_oportunidade.titulo or not nova_oportunidade.cargaHoraria or not nova_oportunidade.requisitos:
         return None #dados incompletos
@@ -29,7 +29,7 @@ def atualizar_oportunidade(oportunidade_id, data):
     oportunidade.titulo = data['titulo']
     oportunidade.cargaHoraria = data['cargaHoraria']
     oportunidade.requisitos = data['requisitos']
-    oportunidade.observacoes = data.get('observacoes')
+    oportunidade.observacoes = data['observacoes']
 
     db.session.commit()
     return oportunidade.to_dict()
