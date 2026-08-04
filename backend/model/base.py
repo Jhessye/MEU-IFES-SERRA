@@ -1,6 +1,7 @@
 from extensions import db
 import uuid
 
+#separando os ID
 class BaseModel(db.Model):
     __abstract__ = True
     
