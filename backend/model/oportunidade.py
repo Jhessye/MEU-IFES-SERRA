@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from base import BaseModel
 from extensions import db
 
@@ -11,7 +10,7 @@ class Oportunidade(BaseModel):
     requisitos = db.Column(db.Text, nullable=True)
     observacoes = db.Column(db.Text, nullable=True)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         return {
             "id": str(self.id),
             "titulo": self.titulo,

@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from base import BaseModel
 from extensions import db
 

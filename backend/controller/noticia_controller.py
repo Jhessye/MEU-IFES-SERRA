@@ -1,4 +1,4 @@
-from services import noticia_service
+from service import noticia_service
 from flask import jsonify, Blueprint, request
 
 noticia_bp = Blueprint('noticia', __name__, url_prefix='/noticia')

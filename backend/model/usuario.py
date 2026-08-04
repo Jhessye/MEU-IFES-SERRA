@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from extensions import db
 from base import BaseModel
 
@@ -9,7 +8,7 @@ class Usuario(BaseModel):
     recebeNotificacaoEdital = db.Column(db.Boolean, default=False, nullable=False)
     recebeNotificacaoOportunidade = db.Column(db.Boolean, default=False, nullable=False)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         return {
             "id": str(self.id),
             "recebeNotificacaoNoticia": self.recebeNotificacaoNoticia,
