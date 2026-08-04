@@ -1,4 +1,4 @@
-from model.usuario import Usuario
+from backend.model.usuario import Usuario
 from extensions import db
 
 def listar_usuarios():

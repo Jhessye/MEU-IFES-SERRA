@@ -1,4 +1,4 @@
-from model.edital import Edital
+from backend.model.edital import Edital
 from extensions import db
 
 def listar_editais():

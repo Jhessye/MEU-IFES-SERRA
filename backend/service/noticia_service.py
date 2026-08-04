@@ -1,4 +1,4 @@
-from model.noticia import Noticia
+from backend.model.noticia import Noticia
 from extensions import db
 
 def listar_noticias():

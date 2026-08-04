@@ -1,4 +1,4 @@
-from model.oportunidade import Oportunidade
+from backend.model.oportunidade import Oportunidade
 from extensions import db
 
 def listar_oportunidades():
