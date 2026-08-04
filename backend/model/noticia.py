@@ -12,7 +12,7 @@ class Noticia(BaseModel):
     texto = db.Column(db.Text, nullable=True)
     imagem = db.Column(db.String(500), nullable=True)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         return {
             "id": str(self.id),
             "titulo": self.titulo,

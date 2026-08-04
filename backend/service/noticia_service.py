@@ -1,0 +1,45 @@
+from model.noticia import Noticia
+from extensions import db
+
+def listar_noticias():
+    noticias = Noticia.query.all()
+    return [noticia.to_dict() for noticia in noticias]  
+
+def criar_noticia(data):
+    nova_noticia = Noticia(
+        titulo=data.get("titulo"),
+        autor=data.get("autor"),
+        data=data.get("data"),
+        texto=data.get("texto"),
+        imagem=data.get("imagem")
+    )
+    if not nova_noticia.titulo or not nova_noticia.autor or not nova_noticia.data or not nova_noticia.texto:
+        return None #dados incompletos
+    db.session.add(nova_noticia)
+    db.session.commit()
+    return nova_noticia.to_dict()
+
+def atualizar_noticia(noticia_id, data):
+    noticia = Noticia.query.get(noticia_id)
+    if not noticia:
+        return None #noticia nao existe
+
+    if not data.get('titulo') or not data.get('autor') or not data.get('data') or not data.get('texto'):
+        return None #dados incompletos
+
+    noticia.titulo = data['titulo']
+    noticia.autor = data['autor']
+    noticia.data = data['data']
+    noticia.texto = data['texto']
+    noticia.imagem = data.get('imagem')
+
+    db.session.commit()
+    return noticia.to_dict()
+
+def deletar_noticia(noticia_id):
+    noticia = Noticia.query.get(noticia_id)
+    if not noticia:
+        return None #noticia nao existe
+    db.session.delete(noticia)
+    db.session.commit()
+    return True
