@@ -1,4 +1,4 @@
-from service import usuario_service
+from backend.service import usuario_service
 from flask import jsonify, Blueprint, request
 
 usuario_bp = Blueprint('usuario', __name__, url_prefix='/usuario')

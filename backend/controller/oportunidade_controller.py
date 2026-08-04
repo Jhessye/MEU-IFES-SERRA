@@ -1,4 +1,4 @@
-from service import oportunidade_service
+from backend.service import oportunidade_service
 from flask import jsonify, Blueprint, request
 
 oportunidade_bp = Blueprint('oportunidade', __name__, url_prefix='/oportunidade')
