@@ -1,5 +1,5 @@
 from backend.model.noticia import Noticia
-from extensions import db
+from backend.extensions import db
 
 def listar_noticias():
     noticias = Noticia.query.all()

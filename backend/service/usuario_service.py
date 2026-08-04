@@ -1,5 +1,5 @@
 from backend.model.usuario import Usuario
-from extensions import db
+from backend.extensions import db
 
 def listar_usuarios():
     usuarios = Usuario.query.all()

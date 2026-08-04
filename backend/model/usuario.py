@@ -1,4 +1,4 @@
-from extensions import db
+from backend.extensions import db
 from backend.model.base import BaseModel
 
 class Usuario(BaseModel):

@@ -1,6 +1,6 @@
 from flask import Flask
 from infra.config import Config
-from backend import extensions as db
+from backend.extensions import db
 from backend.controller import noticia_controller, usuario_controller, edital_controller, oportunidade_controller
 
 app = Flask(__name__)

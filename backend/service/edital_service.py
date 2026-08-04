@@ -1,5 +1,5 @@
 from backend.model.edital import Edital
-from extensions import db
+from backend.extensions import db
 
 def listar_editais():
     edital = Edital.query.all()

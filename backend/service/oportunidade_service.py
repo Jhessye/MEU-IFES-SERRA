@@ -1,5 +1,5 @@
 from backend.model.oportunidade import Oportunidade
-from extensions import db
+from backend.extensions import db
 
 def listar_oportunidades():
     oportunidades = Oportunidade.query.all()

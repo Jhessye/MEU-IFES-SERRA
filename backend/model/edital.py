@@ -1,5 +1,5 @@
 from backend.model.base import BaseModel
-from extensions import db
+from backend.extensions import db
 
 
 class Edital(BaseModel):
