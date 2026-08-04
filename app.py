@@ -1,5 +1,5 @@
 from flask import Flask
-from infra import Config
+from infra.config import Config
 from backend import extensions as db
 from backend.controller import noticia_controller, usuario_controller, edital_controller, oportunidade_controller
 
