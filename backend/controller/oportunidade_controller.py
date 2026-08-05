@@ -1,5 +1,6 @@
 from backend.service import oportunidade_service
 from flask import jsonify, Blueprint, request
+from backend.decorators.auth import admin_required
 
 oportunidade_bp = Blueprint('oportunidade', __name__, url_prefix='/oportunidade')
 
@@ -9,6 +10,7 @@ def listar_oportunidades():
     return jsonify(oportunidades), 200
 
 @oportunidade_bp.route('/', methods=['POST'])
+@admin_required
 def criar_oportunidade():
     data = request.get_json()
     nova_oportunidade = oportunidade_service.criar_oportunidade(data)
@@ -16,7 +18,8 @@ def criar_oportunidade():
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(nova_oportunidade), 201
 
-@oportunidade_bp.route('/<int:oportunidade_id>', methods=['PUT'])
+@oportunidade_bp.route('/<uuid:oportunidade_id>', methods=['PUT'])
+@admin_required
 def atualizar_oportunidade(oportunidade_id):
     data = request.get_json()
     oportunidade_atualizada = oportunidade_service.atualizar_oportunidade(oportunidade_id, data)
@@ -24,7 +27,8 @@ def atualizar_oportunidade(oportunidade_id):
         return jsonify({"error": "Oportunidade não encontrada ou dados incompletos"}), 404
     return jsonify(oportunidade_atualizada), 200
 
-@oportunidade_bp.route('/<int:oportunidade_id>', methods=['DELETE'])
+@oportunidade_bp.route('/<uuid:oportunidade_id>', methods=['DELETE'])
+@admin_required
 def deletar_oportunidade(oportunidade_id):
     oportunidade_deletada = oportunidade_service.deletar_oportunidade(oportunidade_id)
     if oportunidade_deletada is None:

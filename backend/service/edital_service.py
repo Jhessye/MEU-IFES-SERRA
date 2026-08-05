@@ -6,31 +6,46 @@ def listar_editais():
     return [edital.to_dict() for edital in edital]
 
 def criar_edital(data):
-    novo_edital = Edital(
-        titulo=data["titulo"],
-        link=data["link"],
-        texto=data["texto"]
-    )
-    if not novo_edital.titulo or not novo_edital.link or not novo_edital.texto:
-        return None #dados incompletos
-    db.session.add(novo_edital)
-    db.session.commit()
-    return novo_edital.to_dict()
+    try:
+        titulo = data.get("titulo")
+        link = data.get("link")
+        texto = data.get("texto")
+
+        if not titulo or not link or not texto:
+            return None #dados incompletos
+
+        novo_edital = Edital(
+            titulo=titulo,
+            link=link,
+            texto=texto
+        )
+        db.session.add(novo_edital)
+        db.session.commit()
+        return novo_edital.to_dict()
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return None
 
 def atualizar_edital(edital_id, data):
     edital = db.session.get(Edital, edital_id)
     if not edital:
         return None #edital nao existe
 
-    if not data.get('titulo') or not data.get('link') or not data.get('texto'):
-        return None #dados incompletos
+    try:
+        titulo = data.get("titulo")
+        link = data.get("link")
+        texto = data.get("texto")
 
-    edital.titulo = data['titulo']
-    edital.link = data['link']
-    edital.texto = data['texto']
+        if not titulo or not link or not texto:
+            return None #dados incompletos
 
-    db.session.commit()
-    return edital.to_dict()
+        edital.titulo = titulo
+        edital.link = link
+        edital.texto = texto
+
+        db.session.commit()
+        return edital.to_dict()
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return None
 
 def deletar_edital(edital_id):
     edital = db.session.get(Edital, edital_id)

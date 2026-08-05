@@ -1,5 +1,6 @@
 from backend.service import noticia_service
 from flask import jsonify, Blueprint, request
+from backend.decorators.auth import admin_required
 
 noticia_bp = Blueprint('noticia', __name__, url_prefix='/noticia')
 
@@ -9,6 +10,7 @@ def listar_noticias():
     return jsonify(noticias), 200   
 
 @noticia_bp.route('/', methods=['POST'])
+@admin_required
 def criar_noticia():
     data = request.get_json()
     nova_noticia = noticia_service.criar_noticia(data)
@@ -16,7 +18,8 @@ def criar_noticia():
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(nova_noticia), 201
 
-@noticia_bp.route('/<int:noticia_id>', methods=['PUT'])
+@noticia_bp.route('/<uuid:noticia_id>', methods=['PUT'])
+@admin_required
 def atualizar_noticia(noticia_id):
     data = request.get_json()
     noticia_atualizada = noticia_service.atualizar_noticia(noticia_id, data)
@@ -24,7 +27,8 @@ def atualizar_noticia(noticia_id):
         return jsonify({"error": "Notícia não encontrada ou dados incompletos"}), 404
     return jsonify(noticia_atualizada), 200
 
-@noticia_bp.route('/<int:noticia_id>', methods=['DELETE'])
+@noticia_bp.route('/<uuid:noticia_id>', methods=['DELETE'])
+@admin_required
 def deletar_noticia(noticia_id):
     noticia_deletada = noticia_service.deletar_noticia(noticia_id)
     if noticia_deletada is None:

@@ -6,26 +6,36 @@ def listar_usuarios():
     return [usuario.to_dict() for usuario in usuarios]
 
 def criar_usuario(data):
-    novo_usuario = Usuario(
-        recebeNotificacaoNoticia=data["recebeNotificacaoNoticia"],
-        recebeNotificacaoEdital=data["recebeNotificacaoEdital"],
-        recebeNotificacaoOportunidade=data["recebeNotificacaoOportunidade"]
-    )
-    db.session.add(novo_usuario)
-    db.session.commit()
-    return novo_usuario.to_dict()
+    try:
+        recebe_notificacao_noticia = data.get("recebeNotificacaoNoticia")
+        recebe_notificacao_edital = data.get("recebeNotificacaoEdital")
+        recebe_notificacao_oportunidade = data.get("recebeNotificacaoOportunidade")
+
+        novo_usuario = Usuario(
+            recebeNotificacaoNoticia=recebe_notificacao_noticia,
+            recebeNotificacaoEdital=recebe_notificacao_edital,
+            recebeNotificacaoOportunidade=recebe_notificacao_oportunidade
+        )
+        db.session.add(novo_usuario)
+        db.session.commit()
+        return novo_usuario.to_dict()
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return None
 
 def atualizar_usuario(usuario_id, data):
     usuario = db.session.get(Usuario, usuario_id)
     if not usuario:
         return None #usuario nao existe
 
-    usuario.recebeNotificacaoNoticia = data["recebeNotificacaoNoticia"]
-    usuario.recebeNotificacaoEdital = data["recebeNotificacaoEdital"]
-    usuario.recebeNotificacaoOportunidade = data["recebeNotificacaoOportunidade"]
+    try:
+        usuario.recebeNotificacaoNoticia = data.get("recebeNotificacaoNoticia")
+        usuario.recebeNotificacaoEdital = data.get("recebeNotificacaoEdital")
+        usuario.recebeNotificacaoOportunidade = data.get("recebeNotificacaoOportunidade")
 
-    db.session.commit()
-    return usuario.to_dict()
+        db.session.commit()
+        return usuario.to_dict()
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return None
 
 def deletar_usuario(usuario_id):
     usuario = db.session.get(Usuario, usuario_id)

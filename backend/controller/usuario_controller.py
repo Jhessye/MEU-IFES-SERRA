@@ -16,7 +16,7 @@ def criar_usuario():
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(novo_usuario), 201
 
-@usuario_bp.route('/<int:usuario_id>', methods=['PUT'])
+@usuario_bp.route('/<uuid:usuario_id>', methods=['PUT'])
 def atualizar_usuario(usuario_id):
     data = request.get_json()
     usuario_atualizado = usuario_service.atualizar_usuario(usuario_id, data)
@@ -24,7 +24,7 @@ def atualizar_usuario(usuario_id):
         return jsonify({"error": "Usuário não encontrado ou dados incompletos"}), 404
     return jsonify(usuario_atualizado), 200
 
-@usuario_bp.route('/<int:usuario_id>', methods=['DELETE'])
+@usuario_bp.route('/<uuid:usuario_id>', methods=['DELETE'])
 def deletar_usuario(usuario_id):
     usuario_deletado = usuario_service.deletar_usuario(usuario_id)
     if usuario_deletado is None:

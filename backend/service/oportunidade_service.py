@@ -6,33 +6,50 @@ def listar_oportunidades():
     return [oportunidade.to_dict() for oportunidade in oportunidades]
 
 def criar_oportunidade(data):
-    nova_oportunidade = Oportunidade(
-        titulo=data["titulo"],
-        cargaHoraria=data["cargaHoraria"],
-        requisitos=data["requisitos"],
-        observacoes=data["observacoes"]
-    )
-    if not nova_oportunidade.titulo or not nova_oportunidade.cargaHoraria or not nova_oportunidade.requisitos:
-        return None #dados incompletos
-    db.session.add(nova_oportunidade)
-    db.session.commit()
-    return nova_oportunidade.to_dict()
+    try:
+        titulo = data.get("titulo")
+        carga_horaria = data.get("cargaHoraria")
+        requisitos = data.get("requisitos")
+        observacoes = data.get("observacoes")
+
+        if not titulo or not carga_horaria or not requisitos:
+            return None #dados incompletos
+
+        nova_oportunidade = Oportunidade(
+            titulo=titulo,
+            cargaHoraria=carga_horaria,
+            requisitos=requisitos,
+            observacoes=observacoes
+        )
+        db.session.add(nova_oportunidade)
+        db.session.commit()
+        return nova_oportunidade.to_dict()
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return None
 
 def atualizar_oportunidade(oportunidade_id, data):
     oportunidade = db.session.get(Oportunidade, oportunidade_id)
     if not oportunidade:
         return None #oportunidade nao existe
 
-    if not data.get('titulo') or not data.get('cargaHoraria') or not data.get('requisitos'):
-        return None #dados incompletos
+    try:
+        titulo = data.get("titulo")
+        carga_horaria = data.get("cargaHoraria")
+        requisitos = data.get("requisitos")
+        observacoes = data.get("observacoes")
 
-    oportunidade.titulo = data['titulo']
-    oportunidade.cargaHoraria = data['cargaHoraria']
-    oportunidade.requisitos = data['requisitos']
-    oportunidade.observacoes = data['observacoes']
+        if not titulo or not carga_horaria or not requisitos:
+            return None #dados incompletos
 
-    db.session.commit()
-    return oportunidade.to_dict()
+        oportunidade.titulo = titulo
+        oportunidade.cargaHoraria = carga_horaria
+        oportunidade.requisitos = requisitos
+        oportunidade.observacoes = observacoes
+
+        db.session.commit()
+        return oportunidade.to_dict()
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return None
 
 def deletar_oportunidade(oportunidade_id):
     oportunidade = db.session.get(Oportunidade, oportunidade_id)
