@@ -2,7 +2,7 @@ from backend.model.oportunidade import Oportunidade
 from backend.extensions import db
 
 def listar_oportunidades():
-    oportunidades = Oportunidade.query.all()
+    oportunidades = db.session.get(Oportunidade, Oportunidade.id).all()
     return [oportunidade.to_dict() for oportunidade in oportunidades]
 
 def criar_oportunidade(data):
@@ -19,7 +19,7 @@ def criar_oportunidade(data):
     return nova_oportunidade.to_dict()
 
 def atualizar_oportunidade(oportunidade_id, data):
-    oportunidade = Oportunidade.query.get(oportunidade_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
     if not oportunidade:
         return None #oportunidade nao existe
 
@@ -35,7 +35,7 @@ def atualizar_oportunidade(oportunidade_id, data):
     return oportunidade.to_dict()
 
 def deletar_oportunidade(oportunidade_id):
-    oportunidade = Oportunidade.query.get(oportunidade_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
     if not oportunidade:
         return None #oportunidade nao existe
     db.session.delete(oportunidade)

@@ -2,7 +2,7 @@ from backend.model.noticia import Noticia
 from backend.extensions import db
 
 def listar_noticias():
-    noticias = Noticia.query.all()
+    noticias = db.session.get(Noticia, Noticia.id).all()
     return [noticia.to_dict() for noticia in noticias]  
 
 def criar_noticia(data):
@@ -20,7 +20,7 @@ def criar_noticia(data):
     return nova_noticia.to_dict()
 
 def atualizar_noticia(noticia_id, data):
-    noticia = Noticia.query.get(noticia_id)
+    noticia = db.session.get(Noticia, noticia_id)
     if not noticia:
         return None #noticia nao existe
 
@@ -37,7 +37,7 @@ def atualizar_noticia(noticia_id, data):
     return noticia.to_dict()
 
 def deletar_noticia(noticia_id):
-    noticia = Noticia.query.get(noticia_id)
+    noticia = db.session.get(Noticia, noticia_id)
     if not noticia:
         return None #noticia nao existe
     db.session.delete(noticia)

@@ -2,7 +2,7 @@ from backend.model.usuario import Usuario
 from backend.extensions import db
 
 def listar_usuarios():
-    usuarios = Usuario.query.all()
+    usuarios = db.session.get(Usuario, Usuario.id).all()
     return [usuario.to_dict() for usuario in usuarios]
 
 def criar_usuario(data):
@@ -16,7 +16,7 @@ def criar_usuario(data):
     return novo_usuario.to_dict()
 
 def atualizar_usuario(usuario_id, data):
-    usuario = Usuario.query.get(usuario_id)
+    usuario = db.session.get(Usuario, usuario_id)
     if not usuario:
         return None #usuario nao existe
 
@@ -28,7 +28,7 @@ def atualizar_usuario(usuario_id, data):
     return usuario.to_dict()
 
 def deletar_usuario(usuario_id):
-    usuario = Usuario.query.get(usuario_id)
+    usuario = db.session.get(Usuario, usuario_id)
     if not usuario:
         return None #usuario nao existe
     db.session.delete(usuario)

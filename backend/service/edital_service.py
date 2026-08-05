@@ -2,7 +2,7 @@ from backend.model.edital import Edital
 from backend.extensions import db
 
 def listar_editais():
-    edital = Edital.query.all()
+    edital = db.session.get(Edital, Edital.id).all()
     return [edital.to_dict() for edital in edital]
 
 def criar_edital(data):
@@ -18,7 +18,7 @@ def criar_edital(data):
     return novo_edital.to_dict()
 
 def atualizar_edital(edital_id, data):
-    edital = Edital.query.get(edital_id)
+    edital = db.session.get(Edital, edital_id)
     if not edital:
         return None #edital nao existe
 
@@ -33,7 +33,7 @@ def atualizar_edital(edital_id, data):
     return edital.to_dict()
 
 def deletar_edital(edital_id):
-    edital = Edital.query.get(edital_id)
+    edital = db.session.get(Edital, edital_id)
     if not edital:
         return None #edital nao existe
     db.session.delete(edital)
