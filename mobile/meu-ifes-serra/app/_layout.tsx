@@ -1,47 +1,41 @@
 import { useEffect, useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 
 export default function RootLayout() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Função que roda assim que o app abre
-    checkOnboardingStatus();
+    checkOnboarding();
   }, []);
 
-  const checkOnboardingStatus = async () => {
+  const checkOnboarding = async () => {
     try {
-      // 1. Busca a bandeirinha no armazenamento do celular
-      const hasCompletedOnboarding = await AsyncStorage.getItem('has_completed_onboarding');
-
-      // 2 e 3. Verifica o valor e decide para onde navegar
-      if (hasCompletedOnboarding === 'true') {
-        // Se já completou, envia direto para as Tabs (Tela Principal)
+      const hasCompleted = await AsyncStorage.getItem('has_completed_onboarding');
+      
+      // Aguarda um pequeno ciclo para garantir que o layout montou
+      if (hasCompleted === 'true') {
         router.replace('/(tabs)');
       } else {
-        // Se é o primeiro acesso (ou não achou a chave), envia para as Boas-Vindas
         router.replace('/(onboarding)/welcome');
       }
-    } catch (error) {
-      console.log('Erro ao ler o AsyncStorage:', error);
-      // Em caso de erro, por segurança manda para a tela de onboarding
-      router.replace('/(onboarding)/welcome');
+    } catch (e) {
+      console.log('Erro ao ler armazenamento:', e);
     } finally {
-      setIsLoading(false);
+      setIsReady(true);
     }
   };
 
-  // Enquanto está lendo o armazenamento local, mostra um "carregando"
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  return null;
+  return (
+    <>
+      <Stack screenOptions={{ headerShown: false }} />
+      {!isReady && (
+        <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
+    </>
+  );
 }
