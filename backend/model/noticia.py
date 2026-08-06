@@ -6,6 +6,7 @@ class Noticia(BaseModel):
     __tablename__ = "noticias"
 
     titulo = db.Column(db.String(255), nullable=False)
+    link = db.Column(db.String(500), nullable=True)
     autor = db.Column(db.String(255), nullable=False)
     data = db.Column(db.DateTime, nullable=False)
     texto = db.Column(db.Text, nullable=False)
@@ -15,6 +16,7 @@ class Noticia(BaseModel):
         return {
             "id": str(self.id),
             "titulo": self.titulo,
+            "link": self.link,
             "autor": self.autor,
             "data": self.data.isoformat() if self.data else None,
             "texto": self.texto,

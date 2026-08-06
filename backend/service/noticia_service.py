@@ -8,6 +8,7 @@ def listar_noticias():
 def criar_noticia(data):
     try:
         titulo = data.get("titulo")
+        link = data.get("link")
         autor = data.get("autor")
         data_noticia = data.get("data")
         texto = data.get("texto")
@@ -18,6 +19,7 @@ def criar_noticia(data):
 
         nova_noticia = Noticia(
             titulo=titulo,
+            link=link,
             autor=autor,
             data=data_noticia,
             texto=texto,
@@ -36,6 +38,7 @@ def atualizar_noticia(noticia_id, data):
 
     try:
         titulo = data.get("titulo")
+        link = data.get("link")
         autor = data.get("autor")
         data_noticia = data.get("data")
         texto = data.get("texto")
@@ -45,6 +48,7 @@ def atualizar_noticia(noticia_id, data):
             return None #dados incompletos
 
         noticia.titulo = titulo
+        noticia.link = link
         noticia.autor = autor
         noticia.data = data_noticia
         noticia.texto = texto

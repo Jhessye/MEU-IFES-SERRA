@@ -8,6 +8,7 @@ def listar_oportunidades():
 def criar_oportunidade(data):
     try:
         titulo = data.get("titulo")
+        link_vaga = data.get("link_vaga")
         carga_horaria = data.get("cargaHoraria")
         requisitos = data.get("requisitos")
         observacoes = data.get("observacoes")
@@ -17,6 +18,7 @@ def criar_oportunidade(data):
 
         nova_oportunidade = Oportunidade(
             titulo=titulo,
+            link_vaga=link_vaga,
             cargaHoraria=carga_horaria,
             requisitos=requisitos,
             observacoes=observacoes
@@ -34,6 +36,7 @@ def atualizar_oportunidade(oportunidade_id, data):
 
     try:
         titulo = data.get("titulo")
+        link_vaga = data.get("link_vaga")
         carga_horaria = data.get("cargaHoraria")
         requisitos = data.get("requisitos")
         observacoes = data.get("observacoes")
@@ -42,6 +45,7 @@ def atualizar_oportunidade(oportunidade_id, data):
             return None #dados incompletos
 
         oportunidade.titulo = titulo
+        oportunidade.link_vaga = link_vaga
         oportunidade.cargaHoraria = carga_horaria
         oportunidade.requisitos = requisitos
         oportunidade.observacoes = observacoes
