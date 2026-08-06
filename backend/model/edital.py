@@ -7,6 +7,8 @@ class Edital(BaseModel):
 
     titulo = db.Column(db.String(255), nullable=True)
     link = db.Column(db.String(500), nullable=True)
+    pdf = db.Column(db.String(500), nullable=True)
+    formulario = db.Column(db.String(500), nullable=True)
     texto = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
@@ -14,6 +16,8 @@ class Edital(BaseModel):
             "id": str(self.id),
             "titulo": self.titulo,
             "link": self.link,
+            "pdf": self.pdf,
+            "formulario": self.formulario,
             "texto": self.texto,
         }
 

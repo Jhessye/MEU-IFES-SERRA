@@ -9,6 +9,8 @@ def criar_edital(data):
     try:
         titulo = data.get("titulo")
         link = data.get("link")
+        pdf = data.get("pdf")
+        formulario = data.get("formulario")
         texto = data.get("texto")
 
         if not titulo or not link or not texto:
@@ -17,6 +19,8 @@ def criar_edital(data):
         novo_edital = Edital(
             titulo=titulo,
             link=link,
+            pdf=pdf,
+            formulario=formulario,
             texto=texto
         )
         db.session.add(novo_edital)
@@ -33,6 +37,8 @@ def atualizar_edital(edital_id, data):
     try:
         titulo = data.get("titulo")
         link = data.get("link")
+        pdf = data.get("pdf")
+        formulario = data.get("formulario")
         texto = data.get("texto")
 
         if not titulo or not link or not texto:
@@ -40,6 +46,8 @@ def atualizar_edital(edital_id, data):
 
         edital.titulo = titulo
         edital.link = link
+        edital.pdf = pdf
+        edital.formulario = formulario
         edital.texto = texto
 
         db.session.commit()
