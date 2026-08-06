@@ -1,5 +1,6 @@
 from backend.model.edital import Edital
 from backend.extensions import db
+from backend.model.usuario import Usuario
 
 def listar_editais():
     edital = db.session.get(Edital, Edital.id).all()
@@ -61,4 +62,30 @@ def deletar_edital(edital_id):
         return None #edital nao existe
     db.session.delete(edital)
     db.session.commit()
+    return True
+
+def favoritar_edital(usuario_id, edital_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    edital = db.session.get(Edital, edital_id)
+
+    if not usuario or not edital:
+        return False # Usuário ou Edital não encontrado
+
+    if edital not in usuario.editais_salvos:
+        usuario.editais_salvos.append(edital)
+        db.session.commit()
+    
+    return True
+
+def desfavoritar_edital(usuario_id, edital_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    edital = db.session.get(Edital, edital_id)
+
+    if not usuario or not edital:
+        return False
+
+    if edital in usuario.editais_salvos:
+        usuario.editais_salvos.remove(edital)
+        db.session.commit()
+        
     return True
