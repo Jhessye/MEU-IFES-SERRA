@@ -64,7 +64,7 @@ def deletar_edital(edital_id):
     db.session.commit()
     return True
 
-def favoritar_edital(usuario_id, edital_id):
+def salvar_edital(usuario_id, edital_id):
     usuario = db.session.get(Usuario, usuario_id)
     edital = db.session.get(Edital, edital_id)
 
@@ -77,7 +77,7 @@ def favoritar_edital(usuario_id, edital_id):
     
     return True
 
-def desfavoritar_edital(usuario_id, edital_id):
+def dessalvar_edital(usuario_id, edital_id):
     usuario = db.session.get(Usuario, usuario_id)
     edital = db.session.get(Edital, edital_id)
 

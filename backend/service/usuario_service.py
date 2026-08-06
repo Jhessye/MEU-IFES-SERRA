@@ -44,20 +44,3 @@ def deletar_usuario(usuario_id):
     db.session.delete(usuario)
     db.session.commit()
     return True
-
-def set_notificacao(usuario_id, tipo, valor):
-    usuario = db.session.get(Usuario, usuario_id)
-    if not usuario:
-        return None #usuario nao existe
-
-    if tipo == "noticia":
-        usuario.recebeNotificacaoNoticia = valor
-    elif tipo == "edital":
-        usuario.recebeNotificacaoEdital = valor
-    elif tipo == "oportunidade":
-        usuario.recebeNotificacaoOportunidade = valor
-    else:
-        return None #tipo invalido
-
-    db.session.commit()
-    return usuario.to_dict()
