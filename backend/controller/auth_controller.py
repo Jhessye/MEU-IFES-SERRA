@@ -1,7 +1,7 @@
-import os
-
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token
+from werkzeug.security import check_password_hash
+from backend.model.admin import Admin
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -12,14 +12,10 @@ def login_admin():
     username = data.get('username')
     password = data.get('password')
 
-    admin_username = os.getenv('ADMIN_USERNAME')
-    admin_password = os.getenv('ADMIN_PASSWORD')
+    admin = Admin.query.filter_by(username=username).first()
 
-    if not admin_username or not admin_password:
-        return jsonify({"error": "Credenciais administrativas não configuradas"}), 500
-
-    if username != admin_username or password != admin_password:
+    if not admin or not check_password_hash(admin.senha_hash, password or ''):
         return jsonify({"error": "Credenciais inválidas"}), 401
 
-    access_token = create_access_token(identity=username, additional_claims={"role": "admin"})
+    access_token = create_access_token(identity=str(admin.id), additional_claims={"role": "admin"})
     return jsonify({"access_token": access_token}), 200
