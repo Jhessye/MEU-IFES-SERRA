@@ -1,5 +1,6 @@
 from backend.model.oportunidade import Oportunidade
 from backend.extensions import db
+from backend.model.usuario import Usuario
 
 def listar_oportunidades():
     oportunidades = db.session.get(Oportunidade, Oportunidade.id).all()
@@ -61,4 +62,30 @@ def deletar_oportunidade(oportunidade_id):
         return None #oportunidade nao existe
     db.session.delete(oportunidade)
     db.session.commit()
+    return True
+
+def salvar_oportunidade(usuario_id, oportunidade_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
+
+    if not usuario or not oportunidade:
+        return False  # Usuário ou Oportunidade não encontrado
+
+    if oportunidade not in usuario.oportunidades_salvas:
+        usuario.usuario_oportunidades.append(oportunidade)
+        db.session.commit()
+
+    return True
+
+def dessalvar_oportunidade(usuario_id, oportunidade_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
+
+    if not usuario or not oportunidade:
+        return False
+
+    if oportunidade in usuario.oportunidades_salvas:
+        usuario.usuario_oportunidades.remove(oportunidade)
+        db.session.commit()
+
     return True
