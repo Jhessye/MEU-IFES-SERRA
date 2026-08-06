@@ -5,7 +5,8 @@ from backend.extensions import db
 class Oportunidade(BaseModel):
     __tablename__ = "oportunidades"
 
-    titulo = db.Column(db.String(255), nullable=True)
+    titulo = db.Column(db.String(255), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
     cargaHoraria = db.Column(db.String(100), nullable=True)
     requisitos = db.Column(db.Text, nullable=True)
     observacoes = db.Column(db.Text, nullable=True)

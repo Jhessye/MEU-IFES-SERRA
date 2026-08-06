@@ -5,11 +5,11 @@ from backend.extensions import db
 class Edital(BaseModel):
     __tablename__ = "editais"
 
-    titulo = db.Column(db.String(255), nullable=True)
-    link = db.Column(db.String(500), nullable=True)
+    titulo = db.Column(db.String(255), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
     pdf = db.Column(db.String(500), nullable=True)
     formulario = db.Column(db.String(500), nullable=True)
-    texto = db.Column(db.Text, nullable=True)
+    texto = db.Column(db.Text, nullable=False   )
 
     def to_dict(self):
         return {
