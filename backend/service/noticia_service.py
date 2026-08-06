@@ -1,5 +1,6 @@
 from backend.model.noticia import Noticia
 from backend.extensions import db
+from backend.service import notificacao_service
 
 def listar_noticias():
     noticias = db.session.get(Noticia, Noticia.id).all()
@@ -27,6 +28,7 @@ def criar_noticia(data):
         )
         db.session.add(nova_noticia)
         db.session.commit()
+        notificacao_service.notificar_nova_noticia(nova_noticia)
         return nova_noticia.to_dict()
     except (AttributeError, TypeError, KeyError, ValueError):
         return None

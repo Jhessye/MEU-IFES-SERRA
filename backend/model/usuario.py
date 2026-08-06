@@ -21,6 +21,8 @@ class Usuario(BaseModel):
     recebeNotificacaoNoticia = db.Column(db.Boolean, default=False, nullable=False)
     recebeNotificacaoEdital = db.Column(db.Boolean, default=False, nullable=False)
     recebeNotificacaoOportunidade = db.Column(db.Boolean, default=False, nullable=False)
+    #token para envio de notificações push via Firebase Cloud Messaging (FCM)
+    fcm_token = db.Column(db.String(255), nullable=True)
 
     # Relacionamentos N:N
     editais_salvos = db.relationship('Edital', secondary=usuario_editais, backref='usuarios_interessados')

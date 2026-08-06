@@ -1,6 +1,7 @@
 from backend.model.oportunidade import Oportunidade
 from backend.extensions import db
 from backend.model.usuario import Usuario
+from backend.service import notificacao_service
 
 def listar_oportunidades():
     oportunidades = db.session.get(Oportunidade, Oportunidade.id).all()
@@ -26,6 +27,7 @@ def criar_oportunidade(data):
         )
         db.session.add(nova_oportunidade)
         db.session.commit()
+        notificacao_service.notificar_nova_oportunidade(nova_oportunidade)
         return nova_oportunidade.to_dict()
     except (AttributeError, TypeError, KeyError, ValueError):
         return None

@@ -1,6 +1,7 @@
 from backend.model.edital import Edital
 from backend.extensions import db
 from backend.model.usuario import Usuario
+from backend.service import notificacao_service
 
 def listar_editais():
     edital = db.session.get(Edital, Edital.id).all()
@@ -26,6 +27,7 @@ def criar_edital(data):
         )
         db.session.add(novo_edital)
         db.session.commit()
+        notificacao_service.notificar_novo_edital(novo_edital)
         return novo_edital.to_dict()
     except (AttributeError, TypeError, KeyError, ValueError):
         return None

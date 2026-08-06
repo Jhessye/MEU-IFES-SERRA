@@ -44,3 +44,11 @@ def deletar_usuario(usuario_id):
     db.session.delete(usuario)
     db.session.commit()
     return True
+
+def registrar_dispositivo(usuario_id, token):
+    usuario = Usuario.query.get(usuario_id)
+    if usuario is None:
+        return False
+    usuario.fcm_token = token
+    db.session.commit()
+    return True

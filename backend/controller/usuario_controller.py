@@ -58,3 +58,12 @@ def dessalvar_oportunidade(usuario_id, oportunidade_id):
     if not sucesso:
         return jsonify({"error": "Usuário ou Oportunidade não encontrado"}), 404
     return jsonify({"message": "Oportunidade dessalva com sucesso"}), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/dispositivo', methods=['POST'])
+def registrar_dispositivo(usuario_id):
+    data = request.get_json()
+    token = data.get('token')
+    sucesso = usuario_service.registrar_dispositivo(usuario_id, token)
+    if not sucesso:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+    return jsonify({"message": "Dispositivo registrado"}), 200
