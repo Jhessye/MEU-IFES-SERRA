@@ -30,3 +30,31 @@ def deletar_usuario(usuario_id):
     if usuario_deletado is None:
         return jsonify({"error": "Usuário não encontrado"}), 404
     return jsonify({"message": "Usuário deletado com sucesso"}), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/salvar_edital/<uuid:edital_id>', methods=['POST'])
+def salvar_edital(usuario_id, edital_id):
+    sucesso = usuario_service.salvar_edital(usuario_id, edital_id)
+    if not sucesso:
+        return jsonify({"error": "Usuário ou Edital não encontrado"}), 404
+    return jsonify({"message": "Edital salvo com sucesso"}), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/dessalvar_edital/<uuid:edital_id>', methods=['DELETE'])
+def dessalvar_edital(usuario_id, edital_id):
+    sucesso = usuario_service.dessalvar_edital(usuario_id, edital_id)
+    if not sucesso:
+        return jsonify({"error": "Usuário ou Edital não encontrado"}), 404
+    return jsonify({"message": "Edital dessalvo com sucesso"}), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/salvar_oportunidade/<uuid:oportunidade_id>', methods=['POST'])
+def salvar_oportunidade(usuario_id, oportunidade_id):
+    sucesso = usuario_service.salvar_oportunidade(usuario_id, oportunidade_id)
+    if not sucesso:
+        return jsonify({"error": "Usuário ou Oportunidade não encontrado"}), 404
+    return jsonify({"message": "Oportunidade salva com sucesso"}), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/dessalvar_oportunidade/<uuid:oportunidade_id>', methods=['DELETE'])
+def dessalvar_oportunidade(usuario_id, oportunidade_id):
+    sucesso = usuario_service.dessalvar_oportunidade(usuario_id, oportunidade_id)
+    if not sucesso:
+        return jsonify({"error": "Usuário ou Oportunidade não encontrado"}), 404
+    return jsonify({"message": "Oportunidade dessalva com sucesso"}), 200
