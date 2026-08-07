@@ -34,6 +34,8 @@ def listar_admins(page=1, per_page=20):
         "pages": paginacao.pages,
     }
 
+def contar_admins():
+    return db.session.query(Admin).count()
 
 def deletar_admin(admin_id):
     admin = Admin.query.get(admin_id)
