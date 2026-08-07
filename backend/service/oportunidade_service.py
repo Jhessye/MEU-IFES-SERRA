@@ -74,7 +74,7 @@ def salvar_oportunidade(usuario_id, oportunidade_id):
         return False  # Usuário ou Oportunidade não encontrado
 
     if oportunidade not in usuario.oportunidades_salvas:
-        usuario.usuario_oportunidades_salvas.append(oportunidade)
+        usuario.oportunidades_salvas.append(oportunidade)
         db.session.commit()
 
     return True
@@ -87,7 +87,7 @@ def dessalvar_oportunidade(usuario_id, oportunidade_id):
         return False
 
     if oportunidade in usuario.oportunidades_salvas:
-        usuario.usuario_oportunidades_salvas.remove(oportunidade)
+        usuario.oportunidades_salvas.remove(oportunidade)
         db.session.commit()
 
     return True

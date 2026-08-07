@@ -1,5 +1,3 @@
-from ast import Not
-
 from backend.model.noticia import Noticia
 from backend.extensions import db
 from backend.service import notificacao_service
