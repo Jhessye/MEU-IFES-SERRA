@@ -3,9 +3,16 @@ from backend.extensions import db
 from backend.model.usuario import Usuario
 from backend.service import notificacao_service
 
-def listar_oportunidades():
-    oportunidades = Oportunidade.query.all()
-    return [oportunidade.to_dict() for oportunidade in oportunidades]
+def listar_oportunidades(page=1, per_page=20):
+    page = int(page or 1)
+    per_page = int(per_page or 20)
+    paginacao = Oportunidade.query.paginate(page=page, per_page=per_page, error_out=False)
+    return {
+        "items": [oportunidade.to_dict() for oportunidade in paginacao.items],
+        "total": paginacao.total,
+        "page": page,
+        "pages": paginacao.pages,
+    }
 
 def criar_oportunidade(data):
     try:

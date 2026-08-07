@@ -1,9 +1,16 @@
 from backend.model.usuario import Usuario
 from backend.extensions import db
 
-def listar_usuarios():
-    usuarios = Usuario.query.all()
-    return [usuario.to_dict() for usuario in usuarios]
+def listar_usuarios(page=1, per_page=20):
+    page = int(page or 1)
+    per_page = int(per_page or 20)
+    paginacao = Usuario.query.paginate(page=page, per_page=per_page, error_out=False)
+    return {
+        "items": [usuario.to_dict() for usuario in paginacao.items],
+        "total": paginacao.total,
+        "page": page,
+        "pages": paginacao.pages,
+    }
 
 def criar_usuario(data):
     try:

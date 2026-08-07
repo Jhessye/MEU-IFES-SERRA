@@ -23,8 +23,16 @@ def criar_admin(data):
     return novo_admin.to_dict()
 
 
-def listar_admins():
-    return [admin.to_dict() for admin in Admin.query.all()]
+def listar_admins(page=1, per_page=20):
+    page = int(page or 1)
+    per_page = int(per_page or 20)
+    paginacao = Admin.query.paginate(page=page, per_page=per_page, error_out=False)
+    return {
+        "items": [admin.to_dict() for admin in paginacao.items],
+        "total": paginacao.total,
+        "page": page,
+        "pages": paginacao.pages,
+    }
 
 
 def deletar_admin(admin_id):

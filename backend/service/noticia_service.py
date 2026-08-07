@@ -2,9 +2,16 @@ from backend.model.noticia import Noticia
 from backend.extensions import db
 from backend.service import notificacao_service
 
-def listar_noticias():
-    noticias = Noticia.query.all()
-    return [noticia.to_dict() for noticia in noticias]  
+def listar_noticias(page=1, per_page=20):
+    page = int(page or 1)
+    per_page = int(per_page or 20)
+    paginacao = Noticia.query.paginate(page=page, per_page=per_page, error_out=False)
+    return {
+        "items": [noticia.to_dict() for noticia in paginacao.items],
+        "total": paginacao.total,
+        "page": page,
+        "pages": paginacao.pages,
+    }
 
 def criar_noticia(data):
     try:
