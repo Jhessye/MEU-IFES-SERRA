@@ -1,10 +1,11 @@
 # backend/controller/admin_controller.py
-from flask import jsonify, Blueprint, request
+from flask import jsonify, request
+from apiflask import APIBlueprint
 from flask_jwt_extended import get_jwt_identity
 from backend.decorators.auth import admin_required
 from backend.service import admin_service
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+admin_bp = APIBlueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.route('/', methods=['GET'])
 @admin_required
@@ -26,10 +27,11 @@ def criar_admin():
 @admin_bp.route('/<uuid:admin_id>', methods=['DELETE'])
 @admin_required
 def deletar_admin(admin_id):
-    resultado = admin_service.deletar_admin(admin_id)
 
     if admin_service.contar_admins() <= 1:
         return jsonify({"error": "Não é possível deletar o último admin"}), 400
+    
+    resultado = admin_service.deletar_admin(admin_id)
     
     if resultado is None:
         return jsonify({"error": "Admin não encontrado"}), 404

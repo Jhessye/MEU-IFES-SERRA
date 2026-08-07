@@ -1,0 +1,3 @@
+from backend.schema.edital_schema import EditalInSchema
+from backend.schema.noticia_schema import NoticiaInSchema
+from backend.schema.oportunidade_schema import OportunidadeInSchema

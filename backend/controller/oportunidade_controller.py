@@ -1,8 +1,10 @@
 from backend.service import oportunidade_service
-from flask import jsonify, Blueprint, request
+from flask import jsonify
+from apiflask import APIBlueprint
 from backend.decorators.auth import admin_required
+from backend.schema.oportunidade_schema import OportunidadeInSchema
 
-oportunidade_bp = Blueprint('oportunidade', __name__, url_prefix='/oportunidade')
+oportunidade_bp = APIBlueprint('oportunidade', __name__, url_prefix='/oportunidade')
 
 @oportunidade_bp.route('/', methods=['GET'])
 def listar_oportunidades():
@@ -11,18 +13,18 @@ def listar_oportunidades():
 
 @oportunidade_bp.route('/', methods=['POST'])
 @admin_required
-def criar_oportunidade():
-    data = request.get_json()
-    nova_oportunidade = oportunidade_service.criar_oportunidade(data)
+@oportunidade_bp.input(OportunidadeInSchema)
+def criar_oportunidade(json_data):
+    nova_oportunidade = oportunidade_service.criar_oportunidade(json_data)
     if nova_oportunidade is None:
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(nova_oportunidade), 201
 
 @oportunidade_bp.route('/<uuid:oportunidade_id>', methods=['PUT'])
 @admin_required
-def atualizar_oportunidade(oportunidade_id):
-    data = request.get_json()
-    oportunidade_atualizada = oportunidade_service.atualizar_oportunidade(oportunidade_id, data)
+@oportunidade_bp.input(OportunidadeInSchema)
+def atualizar_oportunidade(oportunidade_id, json_data):
+    oportunidade_atualizada = oportunidade_service.atualizar_oportunidade(oportunidade_id, json_data)
     if oportunidade_atualizada is None:
         return jsonify({"error": "Oportunidade não encontrada ou dados incompletos"}), 404
     return jsonify(oportunidade_atualizada), 200

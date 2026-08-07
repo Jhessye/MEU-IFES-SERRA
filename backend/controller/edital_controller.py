@@ -1,8 +1,10 @@
-from flask import jsonify, Blueprint, request
+from flask import jsonify
+from apiflask import APIBlueprint
 from backend.decorators.auth import admin_required
 from backend.service import edital_service
+from backend.schema.edital_schema import EditalInSchema
 
-edital_bp = Blueprint('edital', __name__, url_prefix='/edital')
+edital_bp = APIBlueprint('edital', __name__, url_prefix='/edital')
 
 @edital_bp.route('/', methods=['GET'])
 def listar_editais():
@@ -11,18 +13,18 @@ def listar_editais():
 
 @edital_bp.route('/', methods=['POST'])
 @admin_required
-def criar_edital():
-    data = request.get_json()
-    novo_edital = edital_service.criar_edital(data)
+@edital_bp.input(EditalInSchema)
+def criar_edital(json_data):
+    novo_edital = edital_service.criar_edital(json_data)
     if novo_edital is None:
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(novo_edital), 201
 
 @edital_bp.route('/<uuid:edital_id>', methods=['PUT'])
 @admin_required
-def atualizar_edital(edital_id):
-    data = request.get_json()
-    edital_atualizado = edital_service.atualizar_edital(edital_id, data)
+@edital_bp.input(EditalInSchema)
+def atualizar_edital(edital_id, json_data):
+    edital_atualizado = edital_service.atualizar_edital(edital_id, json_data)
     if edital_atualizado is None:
         return jsonify({"error": "Edital não encontrado ou dados incompletos"}), 404
     return jsonify(edital_atualizado), 200

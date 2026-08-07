@@ -1,7 +1,8 @@
-from flask import Blueprint, app, request, jsonify
+from flask import request, jsonify
+from apiflask import APIBlueprint
 from backend.service.search_service import pesquisar_noticias, pesquisar_editais, pesquisar_oportunidades
 
-search_bp = Blueprint('search', __name__, url_prefix='/search')
+search_bp = APIBlueprint('search', __name__, url_prefix='/search')
 
 
 @search_bp.route('/noticias', methods=['GET'])

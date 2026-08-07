@@ -1,4 +1,4 @@
-from flask import Flask
+from apiflask import APIFlask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from backend.cli import criar_admin, resetar_senha_admin
@@ -6,7 +6,7 @@ from infra.config import Config
 from backend.extensions import db
 from backend.controller import admin_controller, auth_controller, noticia_controller, search_controller, usuario_controller, edital_controller, oportunidade_controller
 
-app = Flask(__name__)
+app = APIFlask(__name__)
 app.config.from_object(Config) # conecta com o banco
 CORS(app)
 JWTManager(app)

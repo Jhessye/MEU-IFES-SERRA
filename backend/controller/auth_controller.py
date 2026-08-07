@@ -1,9 +1,10 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
+from apiflask import APIBlueprint
 from flask_jwt_extended import create_access_token
 from werkzeug.security import check_password_hash
 from backend.model.admin import Admin
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth_bp = APIBlueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth_bp.route('/login', methods=['POST'])

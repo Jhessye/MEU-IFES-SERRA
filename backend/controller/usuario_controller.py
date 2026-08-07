@@ -1,7 +1,8 @@
 from backend.service import usuario_service
-from flask import jsonify, Blueprint, request
+from flask import jsonify, request
+from apiflask import APIBlueprint
 
-usuario_bp = Blueprint('usuario', __name__, url_prefix='/usuario')
+usuario_bp = APIBlueprint('usuario', __name__, url_prefix='/usuario')
 
 @usuario_bp.route('/', methods=['GET'])
 def listar_usuarios():
