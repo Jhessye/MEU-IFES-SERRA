@@ -1,6 +1,9 @@
+from backend.decorators.auth import admin_required
 from backend.service import usuario_service
 from flask import jsonify, request
 from apiflask import APIBlueprint
+from backend.schema.usuario_schema import UsuarioInSchema
+
 
 usuario_bp = APIBlueprint('usuario', __name__, url_prefix='/usuario')
 
@@ -10,14 +13,18 @@ def listar_usuarios():
     return jsonify(usuarios), 200
 
 @usuario_bp.route('/', methods=['POST'])
-def criar_usuario():
-    data = request.get_json()
-    novo_usuario = usuario_service.criar_usuario(data)
+@admin_required
+@usuario_bp.input(UsuarioInSchema)
+def criar_usuario(json_data):
+        
+    novo_usuario = usuario_service.criar_usuario(json_data)
     if novo_usuario is None:
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(novo_usuario), 201
 
 @usuario_bp.route('/<uuid:usuario_id>', methods=['PUT'])
+@admin_required
+@usuario_bp.input(UsuarioInSchema)
 def atualizar_usuario(usuario_id):
     data = request.get_json()
     usuario_atualizado = usuario_service.atualizar_usuario(usuario_id, data)
