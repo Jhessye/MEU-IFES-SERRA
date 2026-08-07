@@ -53,7 +53,7 @@ def deletar_usuario(usuario_id):
     return True
 
 def registrar_dispositivo(usuario_id, token):
-    usuario = Usuario.query.get(usuario_id)
+    usuario = db.session.get(Usuario, usuario_id)
     if usuario is None:
         return False
     usuario.fcm_token = token

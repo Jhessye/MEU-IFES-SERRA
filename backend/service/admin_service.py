@@ -38,7 +38,7 @@ def contar_admins():
     return db.session.query(Admin).count()
 
 def deletar_admin(admin_id):
-    admin = Admin.query.get(admin_id)
+    admin = db.session.get(Admin, admin_id)
     if admin is None:
         return None
     db.session.delete(admin)
@@ -46,7 +46,7 @@ def deletar_admin(admin_id):
     return True
 
 def alterar_senha(admin_id, senha_atual, senha_nova):
-    admin = Admin.query.get(admin_id)
+    admin = db.session.get(Admin, admin_id)
     if admin is None:
         return "nao_encontrado"
 
