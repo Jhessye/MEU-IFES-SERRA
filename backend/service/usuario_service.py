@@ -2,7 +2,7 @@ from backend.model.usuario import Usuario
 from backend.extensions import db
 
 def listar_usuarios():
-    usuarios = db.session.get(Usuario, Usuario.id).all()
+    usuarios = Usuario.query.all()
     return [usuario.to_dict() for usuario in usuarios]
 
 def criar_usuario(data):

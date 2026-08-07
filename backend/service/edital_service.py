@@ -4,7 +4,7 @@ from backend.model.usuario import Usuario
 from backend.service import notificacao_service
 
 def listar_editais():
-    edital = db.session.get(Edital, Edital.id).all()
+    edital = Edital.query.all()
     return [edital.to_dict() for edital in edital]
 
 def criar_edital(data):

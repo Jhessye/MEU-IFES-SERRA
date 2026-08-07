@@ -1,9 +1,11 @@
+from ast import Not
+
 from backend.model.noticia import Noticia
 from backend.extensions import db
 from backend.service import notificacao_service
 
 def listar_noticias():
-    noticias = db.session.get(Noticia, Noticia.id).all()
+    noticias = Noticia.query.all()
     return [noticia.to_dict() for noticia in noticias]  
 
 def criar_noticia(data):

@@ -4,7 +4,7 @@ from backend.model.usuario import Usuario
 from backend.service import notificacao_service
 
 def listar_oportunidades():
-    oportunidades = db.session.get(Oportunidade, Oportunidade.id).all()
+    oportunidades = Oportunidade.query.all()
     return [oportunidade.to_dict() for oportunidade in oportunidades]
 
 def criar_oportunidade(data):
