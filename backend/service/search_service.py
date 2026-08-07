@@ -1,39 +1,31 @@
 from backend.model.edital import Edital
 from backend.model.noticia import Noticia
 from backend.model.oportunidade import Oportunidade
+from sqlalchemy import and_
+
+def _filtro_dinamico(campo, termo):
+    
+    palavras = termo.strip().split()
+    return and_(*[campo.ilike(f"%{palavra}%") for palavra in palavras])
+
 
 def pesquisar_noticias(termo):
-    
     if not termo:
         return []
-    
-    # Busca notícias que COMEÇAM com o termo
-    noticias = Noticia.query.filter(
-        Noticia.titulo.like(f"{termo}%")
+    return Noticia.query.filter(
+        _filtro_dinamico(Noticia.titulo, termo)
     ).all()
-    
-    return noticias
 
 def pesquisar_editais(termo):
-
     if not termo:
         return []
-    
-    # Busca editais que COMEÇAM com o termo
-    editais = Edital.query.filter(
-        Edital.titulo.like(f"{termo}%")
+    return Edital.query.filter(
+        _filtro_dinamico(Edital.titulo, termo)
     ).all()
-    
-    return editais
 
 def pesquisar_oportunidades(termo):
-    
     if not termo:
         return []
-    
-    # Busca oportunidades que COMEÇAM com o termo
-    oportunidades = Oportunidade.query.filter(
-        Oportunidade.titulo.like(f"{termo}%")
+    return Oportunidade.query.filter(
+        _filtro_dinamico(Oportunidade.titulo, termo)
     ).all()
-    
-    return oportunidades
