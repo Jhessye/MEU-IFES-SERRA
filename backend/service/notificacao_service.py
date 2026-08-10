@@ -1,24 +1,37 @@
-from firebase_admin import messaging
+# backend/service/notificacao_service.py
+import requests
 from backend.model.usuario import Usuario
 from backend.extensions import db
+
+EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
+
 
 def _enviar_push(usuarios, titulo, corpo, dados=None):
     tokens = [u.fcm_token for u in usuarios if u.fcm_token]
     if not tokens:
         return
 
-    # FCM aceita até 500 tokens por chamada de multicast
-    for i in range(0, len(tokens), 500):
-        lote = tokens[i:i+500]
-        message = messaging.MulticastMessage(
-            notification=messaging.Notification(title=titulo, body=corpo),
-            data=dados or {},
-            tokens=lote,
-        )
-        response = messaging.send_each_for_multicast(message)
+    for i in range(0, len(tokens), 100):  # Expo aceita até 100 por chamada
+        lote = tokens[i:i + 100]
+        mensagens = [
+            {"to": token, "title": titulo, "body": corpo, "data": dados or {}}
+            for token in lote
+        ]
+        try:
+            resposta = requests.post(
+                EXPO_PUSH_URL,
+                json=mensagens,
+                headers={"Content-Type": "application/json", "Accept": "application/json"},
+                timeout=10,
+            )
+            resultado = resposta.json()
+        except requests.RequestException:
+            continue
 
         tokens_invalidos = [
-            lote[j] for j, r in enumerate(response.responses) if not r.success
+            lote[j] for j, item in enumerate(resultado.get("data", []))
+            if item.get("status") == "error"
+            and item.get("details", {}).get("error") == "DeviceNotRegistered"
         ]
         if tokens_invalidos:
             Usuario.query.filter(Usuario.fcm_token.in_(tokens_invalidos)) \

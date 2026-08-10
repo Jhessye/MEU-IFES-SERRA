@@ -6,6 +6,8 @@ import { Stack, useRouter } from 'expo-router';
 import * as Crypto from 'expo-crypto';
 import api from '@/app/services/api'; // Seu axios configurado
 import { colors } from '@/theme/colors';
+import { registrarParaPushNotifications } from '@/app/services/notifications';
+
 
 export default function RootLayout() {
   const router = useRouter();
@@ -39,6 +41,16 @@ export default function RootLayout() {
           console.log("Usuário criado no backend com sucesso!");
         } catch (error) {
           console.log("Erro ao criar usuário no backend (pode ignorar se já existir):", error);
+        }
+      }
+
+      // dentro de initializeApp, depois do bloco que cria/recupera o userId:
+      const pushToken = await registrarParaPushNotifications();
+      if (pushToken && userId) {
+        try {
+          await api.post(`/usuario/${userId}/dispositivo`, { token: pushToken });
+        } catch (error) {
+          console.log('Erro ao registrar token push:', error);
         }
       }
 
