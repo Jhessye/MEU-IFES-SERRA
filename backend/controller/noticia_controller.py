@@ -1,8 +1,8 @@
-from service import noticia_service
+from backend.service import noticia_service
 from flask import jsonify
 from apiflask import APIBlueprint
-from decorators.auth import admin_required
-from schema.noticia_schema import NoticiaInSchema
+from backend.decorators.auth import admin_required
+from backend.schema.noticia_schema import NoticiaInSchema
 
 noticia_bp = APIBlueprint('noticia', __name__, url_prefix='/noticia')
 

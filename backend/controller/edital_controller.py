@@ -1,8 +1,8 @@
 from flask import jsonify
 from apiflask import APIBlueprint
-from decorators.auth import admin_required
-from service import edital_service
-from schema.edital_schema import EditalInSchema
+from backend.decorators.auth import admin_required
+from backend.service import edital_service
+from backend.schema.edital_schema import EditalInSchema
 
 edital_bp = APIBlueprint('edital', __name__, url_prefix='/edital')
 

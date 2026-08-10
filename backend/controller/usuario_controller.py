@@ -1,8 +1,8 @@
-from decorators.auth import admin_required
-from service import usuario_service
+from backend.decorators.auth import admin_required
+from backend.service import usuario_service
 from flask import jsonify, request
 from apiflask import APIBlueprint
-from schema.usuario_schema import UsuarioInSchema
+from backend.schema.usuario_schema import UsuarioInSchema
 
 
 usuario_bp = APIBlueprint('usuario', __name__, url_prefix='/usuario')

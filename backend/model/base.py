@@ -1,4 +1,4 @@
-from extensions import db
+from backend.extensions import db
 import uuid
 
 #separando os ID

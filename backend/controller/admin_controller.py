@@ -2,8 +2,8 @@
 from flask import jsonify, request
 from apiflask import APIBlueprint
 from flask_jwt_extended import get_jwt_identity
-from decorators.auth import admin_required
-from service import admin_service
+from backend.decorators.auth import admin_required
+from backend.service import admin_service
 
 admin_bp = APIBlueprint('admin', __name__, url_prefix='/admin')
 
