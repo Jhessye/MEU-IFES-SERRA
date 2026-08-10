@@ -1,14 +1,12 @@
 from backend.extensions import db
 from backend.model.base import BaseModel
 
-# Tabela intermediária para Usuários <-> Editais
 usuario_editais = db.Table(
     'usuario_editais',
     db.Column('usuario_id', db.Uuid, db.ForeignKey('usuarios.id'), primary_key=True),
     db.Column('edital_id', db.Uuid, db.ForeignKey('editais.id'), primary_key=True)
 )
 
-# Tabela intermediária para Usuários <-> Oportunidades/Vagas
 usuario_oportunidades = db.Table(
     'usuario_oportunidades',
     db.Column('usuario_id', db.Uuid, db.ForeignKey('usuarios.id'), primary_key=True),

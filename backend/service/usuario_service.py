@@ -14,11 +14,13 @@ def listar_usuarios(page=1, per_page=20):
 
 def criar_usuario(data):
     try:
+        usuario_id = data.get("id")  # pode vir None
         recebe_notificacao_noticia = data.get("recebeNotificacaoNoticia")
         recebe_notificacao_edital = data.get("recebeNotificacaoEdital")
         recebe_notificacao_oportunidade = data.get("recebeNotificacaoOportunidade")
 
         novo_usuario = Usuario(
+            id=usuario_id,  # se None, o default do BaseModel assume
             recebeNotificacaoNoticia=recebe_notificacao_noticia,
             recebeNotificacaoEdital=recebe_notificacao_edital,
             recebeNotificacaoOportunidade=recebe_notificacao_oportunidade
