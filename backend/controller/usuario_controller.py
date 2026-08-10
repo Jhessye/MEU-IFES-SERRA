@@ -64,6 +64,27 @@ def dessalvar_oportunidade(usuario_id, oportunidade_id):
         return jsonify({"error": "Usuário ou Oportunidade não encontrado"}), 404
     return jsonify({"message": "Oportunidade dessalva com sucesso"}), 200
 
+@usuario_bp.route('/<uuid:usuario_id>/notificacao/noticia', methods=['PATCH'])
+def alternar_notificacao_noticia(usuario_id):
+    usuario_atualizado = usuario_service.alternar_notificacao(usuario_id, 'recebeNotificacaoNoticia')
+    if usuario_atualizado is None:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+    return jsonify(usuario_atualizado), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/notificacao/edital', methods=['PATCH'])
+def alternar_notificacao_edital(usuario_id):
+    usuario_atualizado = usuario_service.alternar_notificacao(usuario_id, 'recebeNotificacaoEdital')
+    if usuario_atualizado is None:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+    return jsonify(usuario_atualizado), 200
+
+@usuario_bp.route('/<uuid:usuario_id>/notificacao/oportunidade', methods=['PATCH'])
+def alternar_notificacao_oportunidade(usuario_id):
+    usuario_atualizado = usuario_service.alternar_notificacao(usuario_id, 'recebeNotificacaoOportunidade')
+    if usuario_atualizado is None:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+    return jsonify(usuario_atualizado), 200
+
 @usuario_bp.route('/<uuid:usuario_id>/dispositivo', methods=['POST'])
 def registrar_dispositivo(usuario_id):
     data = request.get_json()

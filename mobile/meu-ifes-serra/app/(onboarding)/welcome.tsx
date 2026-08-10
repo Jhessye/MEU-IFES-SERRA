@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     // e o mantém alinhado à esquerda junto com o texto!
     alignSelf: 'center', // Centraliza o botão horizontalmente dentro do bloco 'content'
     marginTop: 45, // Espaço extra após a descrição
-    width: '65%', // Faz o botão ocupar toda a largura do bloco 'content'
+    width: '80%', // Faz o botão ocupar toda a largura do bloco 'content'
   },
   buttonBorder: {
     padding: 2,               

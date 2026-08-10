@@ -52,6 +52,21 @@ def deletar_usuario(usuario_id):
     db.session.commit()
     return True
 
+def alternar_notificacao(usuario_id, campo_preferencia):
+    usuario = db.session.get(Usuario, usuario_id)
+    if usuario is None:
+        return None
+
+    if campo_preferencia == 'recebeNotificacaoNoticia':
+        usuario.recebeNotificacaoNoticia = not usuario.recebeNotificacaoNoticia
+    elif campo_preferencia == 'recebeNotificacaoEdital':
+        usuario.recebeNotificacaoEdital = not usuario.recebeNotificacaoEdital
+    elif campo_preferencia == 'recebeNotificacaoOportunidade':
+        usuario.recebeNotificacaoOportunidade = not usuario.recebeNotificacaoOportunidade
+
+    db.session.commit()
+    return usuario.to_dict()
+
 def registrar_dispositivo(usuario_id, token):
     usuario = db.session.get(Usuario, usuario_id)
     if usuario is None:
