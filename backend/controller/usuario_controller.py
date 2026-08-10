@@ -13,7 +13,6 @@ def listar_usuarios():
     return jsonify(usuarios), 200
 
 @usuario_bp.route('/', methods=['POST'])
-@admin_required
 @usuario_bp.input(UsuarioInSchema)
 def criar_usuario(json_data):
         
@@ -23,11 +22,9 @@ def criar_usuario(json_data):
     return jsonify(novo_usuario), 201
 
 @usuario_bp.route('/<uuid:usuario_id>', methods=['PUT'])
-@admin_required
 @usuario_bp.input(UsuarioInSchema)
-def atualizar_usuario(usuario_id):
-    data = request.get_json()
-    usuario_atualizado = usuario_service.atualizar_usuario(usuario_id, data)
+def atualizar_usuario(usuario_id, json_data):
+    usuario_atualizado = usuario_service.atualizar_usuario(usuario_id, json_data)
     if usuario_atualizado is None:
         return jsonify({"error": "Usuário não encontrado ou dados incompletos"}), 404
     return jsonify(usuario_atualizado), 200
