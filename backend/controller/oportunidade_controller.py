@@ -1,8 +1,8 @@
-from backend.service import oportunidade_service
+from service import oportunidade_service
 from flask import jsonify
 from apiflask import APIBlueprint
-from backend.decorators.auth import admin_required
-from backend.schema.oportunidade_schema import OportunidadeInSchema
+from decorators.auth import admin_required
+from schema.oportunidade_schema import OportunidadeInSchema
 
 oportunidade_bp = APIBlueprint('oportunidade', __name__, url_prefix='/oportunidade')
 

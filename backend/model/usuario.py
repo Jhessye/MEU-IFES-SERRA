@@ -1,5 +1,5 @@
-from backend.extensions import db
-from backend.model.base import BaseModel
+from extensions import db
+from model.base import BaseModel
 
 # Tabela intermediária para Usuários <-> Editais
 usuario_editais = db.Table(
