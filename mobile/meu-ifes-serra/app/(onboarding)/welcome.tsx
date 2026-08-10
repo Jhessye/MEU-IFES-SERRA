@@ -15,15 +15,15 @@ export default function WelcomeScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Bloco que contém TUDO (textos, features e botão) */}
       <View style={styles.content}>
-        <View>
-          <Text style={styles.heading}>
-            Ola! :D{'\n'}Seja bem vindo ao seu Ifes Serra.
-          </Text>
-          <Text style={styles.subtitle}>Vamos personalizar seu ambiente?</Text>
-          <View style={styles.dot} />
-        </View>
 
+        {/* --- Título principal --- */}
+        <Text style={styles.heading}>
+          Ola! :D{'\n'}Seja bem vindo ao seu Ifes Serra.
+        </Text>
+
+        {/* --- Bloco "O que você vai encontrar aqui" --- */}
         <View style={styles.featuresBlock}>
           <Text style={styles.sectionTitle}>O que você vai encontrar aqui</Text>
 
@@ -38,21 +38,22 @@ export default function WelcomeScreen() {
             que você precisa em um só lugar.
           </Text>
         </View>
-      </View>
 
-      <Pressable onPress={handleContinue}>
-        <LinearGradient
-          colors={[colors.greenAccent, colors.red]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.buttonBorder}
-        >
-          <View style={styles.buttonInner}>
-            <Text style={styles.buttonText}>Continuar</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.white} />
-          </View>
-        </LinearGradient>
-      </Pressable>
+        {/* --- Botão "Continuar" --- */}
+        <Pressable onPress={handleContinue} style={styles.buttonWrapper}>
+          <LinearGradient
+            colors={[colors.greenAccent, colors.red]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonBorder}
+          >
+            <View style={styles.buttonInner}>
+              <Text style={styles.buttonText}>Continuar</Text>
+              <Ionicons name="arrow-forward" size={25} color={colors.white} />
+            </View>
+          </LinearGradient>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -71,79 +72,99 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 32,
-    justifyContent: 'space-between',
+    // Isso joga o bloco 'content' exatamente no meio vertical da tela
+    justifyContent: 'center', 
+    // Isso centraliza o bloco 'content' no meio horizontal da tela
+    alignItems: 'center',     
   },
-  content: { flex: 1, gap: 24 },
+
+  content: {
+    width: '100%', 
+    // Ao contrário do 'center', isso alinha TODO o texto, as pills e o botão 
+    // no canto esquerdo DENTRO desse bloco.
+    alignItems: 'flex-start', 
+    gap: 24,                
+  },
+
+  // --- TÍTULO ---
   heading: {
-    fontSize: 32,
-    fontWeight: '700',
-    lineHeight: 40,
+    fontSize: 36,          
+    fontWeight: '700',     
+    lineHeight: 50,        
     color: colors.greenDark,
+    textAlign: 'left',     // O texto fica alinhado à esquerda
+    marginBottom: 35,      // Espaço entre o título e o bloco de features
   },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.greenAccent,
-    marginTop: 12,
+  redLetter: {
+    color: colors.red,     
   },
-  dot: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.red,
-    top: 30,
-    left: 118, // ajuste fino conforme a fonte que você escolher
+
+  // --- BLOCO DAS FEATURES ---
+  featuresBlock: {
+    width: '100%',
+    alignItems: 'flex-start', // O título da seção e a descrição ficam alinhados à esquerda
+    gap: 14,                
   },
-  featuresBlock: { gap: 14 },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 18,           
     fontWeight: '700',
     color: colors.textDark,
+    textAlign: 'left',      // Alinhado à esquerda
   },
   featuresRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+    flexDirection: 'row',    
+    flexWrap: 'wrap',        
+    justifyContent: 'flex-start', // As "pills" começam na esquerda
+    gap: 10,                 
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 6,                  
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 999,
-    paddingVertical: 9,
-    paddingHorizontal: 12,
+    borderRadius: 999,       
+    paddingVertical: 9,      
+    paddingHorizontal: 12,   
   },
   featureLabel: {
-    fontSize: 13,
+    fontSize: 13,            
     fontWeight: '600',
     color: colors.textDark,
   },
+
   description: {
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 14,            
+    lineHeight: 21,          
     color: colors.textGray,
+    textAlign: 'left',       // Alinhado à esquerda
+  },
+
+  // --- BOTÃO "CONTINUAR" ---
+  buttonWrapper: {
+    // Como o pai está 'flex-start', isso aqui faz o botão ter o tamanho exato do conteúdo interno
+    // e o mantém alinhado à esquerda junto com o texto!
+    alignSelf: 'center', // Centraliza o botão horizontalmente dentro do bloco 'content'
+    marginTop: 45, // Espaço extra após a descrição
+    width: '65%', // Faz o botão ocupar toda a largura do bloco 'content'
   },
   buttonBorder: {
-    padding: 2,
-    borderRadius: 14,
+    padding: 2,               
+    borderRadius: 14,         
   },
   buttonInner: {
     flexDirection: 'row',
-    gap: 8,
-    height: 48,
+    gap: 8,                   
+    height: 48,                
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.greenAccent,
-    borderRadius: 12,
+    borderRadius: 12,          
+    paddingHorizontal: 24,     // Adicionei isso para o botão não ficar "apertado"
   },
   buttonText: {
     color: colors.white,
-    fontSize: 15,
+    fontSize: 18,               
     fontWeight: '700',
   },
 });
