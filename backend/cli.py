@@ -1,7 +1,7 @@
 import click
 from werkzeug.security import generate_password_hash
-from backend.extensions import db
-from backend.model.admin import Admin
+from extensions import db
+from model.admin import Admin
 
 @click.command("criar-admin")
 @click.argument("username")
