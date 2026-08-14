@@ -6,7 +6,7 @@ class Noticia(BaseModel):
     __tablename__ = "noticias"
 
     titulo = db.Column(db.String(255), nullable=False)
-    link = db.Column(db.String(500), nullable=True)
+    link = db.Column(db.String(500), nullable=False)
     autor = db.Column(db.String(255), nullable=False)
     data = db.Column(db.DateTime, nullable=False)
     texto = db.Column(db.Text, nullable=False)
