@@ -1,7 +1,6 @@
 // app/components/ListContainer.tsx
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { colors } from '@/theme/colors';
 
 // O componente que vai ser "envelopado" pelo container
 type ListContainerProps<T> = {
