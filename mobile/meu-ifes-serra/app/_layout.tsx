@@ -6,7 +6,7 @@ import { Stack, useRouter } from 'expo-router';
 import * as Crypto from 'expo-crypto';
 import api from '@/app/services/api'; // Seu axios configurado
 import { colors } from '@/theme/colors';
-import { registrarParaPushNotifications } from '@/app/services/notificationService';
+import { registrarParaPushNotifications } from '@/src/notificationService';
 
 
 export default function RootLayout() {
