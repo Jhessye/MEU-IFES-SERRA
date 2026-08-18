@@ -15,6 +15,8 @@ def listar_noticias(page=1, per_page=20):
 
 def criar_noticia(data):
     try:
+        print("DATA RECEBIDA:", data)
+
         titulo = data.get("titulo")
         link = data.get("link")
         autor = data.get("autor")
@@ -22,8 +24,16 @@ def criar_noticia(data):
         texto = data.get("texto")
         imagem = data.get("imagem")
 
+        print("titulo:", titulo)
+        print("link:", link)
+        print("autor:", autor)
+        print("data:", data_noticia, type(data_noticia))
+        print("texto:", texto)
+        print("imagem:", imagem)
+
         if not titulo or not autor or not data_noticia or not texto:
-            return None #dados incompletos
+            print("DADOS INCOMPLETOS")
+            return None
 
         nova_noticia = Noticia(
             titulo=titulo,
@@ -33,12 +43,18 @@ def criar_noticia(data):
             texto=texto,
             imagem=imagem
         )
+
         db.session.add(nova_noticia)
         db.session.commit()
+
         notificacao_service.notificar_nova_noticia(nova_noticia)
+
         return nova_noticia.to_dict()
-    except (AttributeError, TypeError, KeyError, ValueError):
-        return None
+
+    except Exception as e:
+        print("ERRO REAL:", type(e).__name__, str(e))
+        db.session.rollback()
+        raise
 
 def atualizar_noticia(noticia_id, data):
     noticia = db.session.get(Noticia, noticia_id)
