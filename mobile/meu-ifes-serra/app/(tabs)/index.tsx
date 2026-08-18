@@ -1,29 +1,46 @@
-// app/(tabs)/index.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  TextInput,
+  FlatList,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { ListContainer } from '@/components/ListContainer'; 
 import { colors } from '@/theme/colors';
 import api from '@/app/services/api';
 
-// --- 1. DEFININDO O TIPO EXATO DOS DADOS ---
+// -----------------------------------------------------
+// TIPO DOS DADOS
+// -----------------------------------------------------
+
 type Noticia = {
   id: string;
   titulo: string;
   autor: string;
-  data: string;       // Vai vir do banco (ex: "2026-08-10" ou "10/08/2026")
-  imagem?: string;    // Opcional (URL da imagem)
+  data: string;
+  imagem?: string;
   texto: string;
-  link: string;      // Opcional
+  link: string;
 };
 
+// -----------------------------------------------------
+// TELA PRINCIPAL
+// -----------------------------------------------------
+
 export default function HomeScreen() {
-  // --- 2. ESTADOS DO REACT ---
   const [noticias, setNoticias] = useState<Noticia[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
-  // --- 3. BUSCAR DADOS DO BACKEND ---
+  // ---------------------------------------------------
+  // BUSCAR NOTÍCIAS
+  // ---------------------------------------------------
+
   useEffect(() => {
     buscarNoticias();
   }, []);
@@ -31,12 +48,11 @@ export default function HomeScreen() {
   const buscarNoticias = async () => {
     try {
       setIsLoading(true);
-      // Bate na rota GET /noticia do seu Flask
+
       const response = await api.get('/noticia');
-      
-      // Lógica esperta: Se o backend retornar { items: [...] }, usa items. 
-      // Se retornar a lista direta, usa o próprio response.data.
-      const dadosRecebidos = response.data?.items || response.data;
+
+      const dadosRecebidos =
+        response.data?.items || response.data;
 
       setNoticias(dadosRecebidos);
     } catch (error) {
@@ -46,121 +62,419 @@ export default function HomeScreen() {
     }
   };
 
-  // --- 4. TELA DE LOADING ---
+  // ---------------------------------------------------
+  // FILTRO DA PESQUISA
+  // ---------------------------------------------------
+
+  const noticiasFiltradas = noticias.filter((item) => {
+    const textoBusca = search.toLowerCase().trim();
+
+    if (!textoBusca) return true;
+
+    return (
+      item.titulo?.toLowerCase().includes(textoBusca) ||
+      item.texto?.toLowerCase().includes(textoBusca)
+    );
+  });
+
+  // ---------------------------------------------------
+  // LOADING
+  // ---------------------------------------------------
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.greenAccent} />
-        <Text style={{ marginTop: 10, color: '#666' }}>Carregando notícias...</Text>
+        <ActivityIndicator
+          size="large"
+          color={colors.greenAccent}
+        />
+
+        <Text style={styles.loadingText}>
+          Carregando notícias...
+        </Text>
       </SafeAreaView>
     );
   }
 
-  // --- 5. RENDERIZAÇÃO DA TELA ---
+  // ---------------------------------------------------
+  // TELA
+  // ---------------------------------------------------
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notícias</Text>
+    <View style={styles.container}>
+
+      {/* --------------------------------------------- */}
+      {/* HEADER */}
+      {/* --------------------------------------------- */}
+
+      
+
+      {/* --------------------------------------------- */}
+      {/* CONTEÚDO */}
+      {/* --------------------------------------------- */}
+
+      <View style={styles.content}>
+
+        {/* PESQUISA */}
+
+        <View style={styles.searchContainer}>
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Valor"
+            placeholderTextColor="#C7C7C7"
+            style={styles.searchInput}
+            returnKeyType="search"
+          />
+
+          <Ionicons
+            name="search-outline"
+            size={15}
+            color={colors.red}
+            style={styles.searchIcon}
+          />
+        </View>
+
+        {/* LISTA */}
+
+        <FlatList
+          data={noticiasFiltradas}
+          keyExtractor={(item) => String(item.id)}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={() => (
+            <View style={styles.cardSeparator} />
+          )}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.card}
+            >
+
+              {/* IMAGEM */}
+
+              <Image
+                source={{
+                  uri:
+                    item.imagem ||
+                    'https://via.placeholder.com/100x80/EEEEEE/CCCCCC?text=',
+                }}
+                style={styles.noticiaImage}
+              />
+
+              {/* INFORMAÇÕES */}
+
+              <View style={styles.textContainer}>
+
+                <Text
+                  style={styles.title}
+                  numberOfLines={1}
+                >
+                  {item.titulo || 'Title'}
+                </Text>
+
+                <Text
+                  style={styles.description}
+                  numberOfLines={2}
+                >
+                  {item.texto ||
+                    'Body text for whatever you’d like to say. Add main takeaway points.'}
+                </Text>
+
+                <Text style={styles.date}>
+                  {formatarData(item.data)}
+                </Text>
+
+              </View>
+
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons
+                name="newspaper-outline"
+                size={40}
+                color="#CFCFCF"
+              />
+
+              <Text style={styles.emptyText}>
+                Nenhuma notícia encontrada.
+              </Text>
+            </View>
+          }
+        />
+
       </View>
 
-      {/* Lista utilizando o componente ListContainer */}
-      <ListContainer
-        data={noticias}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}>
-            
-            {/* Imagem (Usa um placeholder se não tiver imagem cadastrada) */}
-            <Image 
-              source={{ uri: item.imagem || 'https://via.placeholder.com/150/EEEEEE/333333?text=IFES' }} 
-              style={styles.noticiaImage} 
-            />
-            
-            {/* Textos */}
-            <View style={styles.textContainer}>
-              <Text style={styles.title} numberOfLines={2}>{item.titulo}</Text>
-              <Text style={styles.author}>Por: {item.autor}</Text>
-              
-              <View style={styles.footerRow}>
-                {/* Exibe a data */}
-                <Text style={styles.date}>{item.data}</Text>
-                {/* Ícone de seta */}
-                <Ionicons name="chevron-forward" size={16} color={colors.greenAccent} />
-              </View>
-            </View>
-
-          </TouchableOpacity>
-        )}
-      />
-    </SafeAreaView>
+    </View>
   );
 }
 
-// --- 6. ESTILOS ---
+// -----------------------------------------------------
+// FORMATAR DATA
+// -----------------------------------------------------
+
+function formatarData(data: string) {
+  if (!data) return '';
+
+  // Se já vier no formato DD/MM/YYYY
+  if (data.includes('/')) {
+    return data;
+  }
+
+  // Se vier YYYY-MM-DD
+  const partes = data.split('-');
+
+  if (partes.length === 3) {
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+
+  return data;
+}
+
+// -----------------------------------------------------
+// ESTILOS
+// -----------------------------------------------------
+
 const styles = StyleSheet.create({
+
+  // ---------------------------------------------------
+  // CONTAINER
+  // ---------------------------------------------------
+
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    paddingHorizontal: 16,
+    backgroundColor: '#F8F8F8',
   },
+
+  // ---------------------------------------------------
+  // LOADING
+  // ---------------------------------------------------
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F8F8F8',
   },
+
+  loadingText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#777',
+  },
+
+  // ---------------------------------------------------
+  // HEADER
+  // ---------------------------------------------------
+
+  headerGradient: {
+    height: 105,
+    width: '100%',
+  },
+
   header: {
-    paddingVertical: 20,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+
+  menuButton: {
+    width: 42,
+    height: 42,
+    justifyContent: 'center',
     alignItems: 'center',
   },
+
   headerTitle: {
+    flex: 1,
+
     fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.greenDark,
+    fontWeight: '600',
+
+    color: colors.white,
+
+    marginLeft: 4,
   },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    gap: 12,
+
+  headerRight: {
+    width: 42,
+  },
+
+  // ---------------------------------------------------
+  // CONTEÚDO
+  // ---------------------------------------------------
+
+  content: {
+    flex: 1,
+
+    paddingHorizontal: 14,
+
+    marginTop: -2,
+  },
+
+  // ---------------------------------------------------
+  // PESQUISA
+  // ---------------------------------------------------
+
+  searchContainer: {
+    height: 38,
+
+    backgroundColor: colors.white,
+
+    borderRadius: 20,
+
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: '#E3E3E3',
+
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    paddingLeft: 14,
+    paddingRight: 12,
+
+    marginBottom: 14,
+
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+
+    elevation: 1,
   },
-  noticiaImage: {
-    width: 80,
-    height: 80,
+
+  searchInput: {
+    flex: 1,
+
+    height: '100%',
+
+    padding: 0,
+
+    fontSize: 13,
+
+    color: '#555',
+  },
+
+  searchIcon: {
+    marginLeft: 5,
+
+    fontSize: 18,
+  },
+
+  // ---------------------------------------------------
+  // LISTA
+  // ---------------------------------------------------
+
+  listContent: {
+    paddingBottom: 90,
+  },
+
+  cardSeparator: {
+    height: 12,
+  },
+
+  // ---------------------------------------------------
+  // CARD
+  // ---------------------------------------------------
+
+  card: {
+    width: '100%',
+
+    minHeight: 92,
+
+    flexDirection: 'row',
+
+    backgroundColor: colors.white,
+
+    borderWidth: 1,
+    borderColor: '#E4E4E4',
+
     borderRadius: 8,
-    backgroundColor: '#E5E5E5',
+
+    padding: 10,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
+
+    elevation: 1,
   },
+
+  noticiaImage: {
+    width: 78,
+    height: 70,
+
+    borderRadius: 4,
+
+    backgroundColor: '#E7E7E7',
+  },
+
   textContainer: {
     flex: 1,
+
+    marginLeft: 12,
+
     justifyContent: 'space-between',
+
+    paddingVertical: 1,
   },
+
   title: {
-    fontSize: 16,
+    fontSize: 14,
+
+    lineHeight: 18,
+
     fontWeight: '700',
+
     color: '#333',
+
+    marginBottom: 4,
   },
-  author: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
+
+  description: {
+    fontSize: 11,
+
+    lineHeight: 15,
+
+    color: '#777',
+
+    marginBottom: 3,
   },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 6,
-  },
+
   date: {
-    fontSize: 12,
+    fontSize: 9,
+
+    lineHeight: 12,
+
+    fontWeight: '600',
+
+    color: '#222',
+  },
+
+  // ---------------------------------------------------
+  // VAZIO
+  // ---------------------------------------------------
+
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    paddingTop: 80,
+  },
+
+  emptyText: {
+    marginTop: 12,
+
+    fontSize: 15,
+
     color: '#999',
   },
 });
