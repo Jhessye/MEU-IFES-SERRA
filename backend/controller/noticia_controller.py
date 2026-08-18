@@ -12,7 +12,7 @@ def listar_noticias():
     return jsonify(noticias), 200   
 
 @noticia_bp.route('/', methods=['POST'])
-@admin_required
+#@admin_required
 @noticia_bp.input(NoticiaInSchema)
 def criar_noticia(json_data):
     nova_noticia = noticia_service.criar_noticia(json_data)
@@ -21,7 +21,7 @@ def criar_noticia(json_data):
     return jsonify(nova_noticia), 201
 
 @noticia_bp.route('/<uuid:noticia_id>', methods=['PUT'])
-@admin_required
+#@admin_required
 @noticia_bp.input(NoticiaInSchema)
 def atualizar_noticia(noticia_id, json_data):
     noticia_atualizada = noticia_service.atualizar_noticia(noticia_id, json_data)
@@ -30,7 +30,7 @@ def atualizar_noticia(noticia_id, json_data):
     return jsonify(noticia_atualizada), 200
 
 @noticia_bp.route('/<uuid:noticia_id>', methods=['DELETE'])
-@admin_required
+#@admin_required
 def deletar_noticia(noticia_id):
     noticia_deletada = noticia_service.deletar_noticia(noticia_id)
     if noticia_deletada is None:
