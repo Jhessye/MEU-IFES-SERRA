@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#ffffff',
   },
 
   // ---------------------------------------------------
@@ -326,15 +326,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
 
     borderWidth: 1,
-    borderColor: '#E3E3E3',
+    borderColor: '#E0E0E0',
 
     flexDirection: 'row',
     alignItems: 'center',
 
-    paddingLeft: 14,
-    paddingRight: 12,
+    paddingHorizontal: 13,
 
-    marginBottom: 14,
+    marginBottom: 8,
+    marginTop: 2,
 
     shadowColor: '#000',
     shadowOffset: {

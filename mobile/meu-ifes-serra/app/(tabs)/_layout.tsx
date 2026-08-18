@@ -19,7 +19,7 @@ export default function TabsLayout() {
         colors={[
           colors.greenAccent,
           '#7bc284',
-          '#f5f8f5',
+          '#ffffff',
         ]}
         locations={[0, 0.55, 1]}
         start={{ x: 0, y: 0 }}
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   // ----------------------------------------------------
 
   headerGradient: {
-    height: 120,
+    height: 130,
     width: '100%',
   },
 
