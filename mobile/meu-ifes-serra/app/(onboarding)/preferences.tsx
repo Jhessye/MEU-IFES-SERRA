@@ -136,6 +136,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingHorizontal: 24,
     paddingTop: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContent: {
     paddingBottom: 100, 

@@ -2,10 +2,146 @@
 	"info": {
 		"_postman_id": "bfd01a06-398d-4920-ae69-0c5dfcf7e81c",
 		"name": "MEU IFES Serra API",
-		"description": "Coleção de rotas do backend Flask (Usuários, Editais, Oportunidades e Notícias)",
+		"description": "Coleção de rotas do backend Flask do projeto MEU IFES Serra (admin, autenticação, usuários, editais, oportunidades, notícias e busca)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Login Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"minhasenha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admins",
+			"item": [
+				{
+					"name": "Listar Admins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"novo_admin\",\n  \"senha\": \"minhasenha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Senha do Admin",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_admin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"senha_atual\": \"minhasenha123\",\n  \"senha_nova\": \"novaSenha456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/{{admin_id}}/senha",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"{{admin_id}}",
+								"senha"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar Admin",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/{{admin_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"{{admin_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "Usuários",
 			"item": [
@@ -40,7 +176,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"recebeNotificacaoNoticia\": true,\n    \"recebeNotificacaoEdital\": false,\n    \"recebeNotificacaoOportunidade\": true\n}"
+							"raw": "{\n  \"recebeNotificacaoNoticia\": true,\n  \"recebeNotificacaoEdital\": false,\n  \"recebeNotificacaoOportunidade\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/usuario/",
@@ -68,16 +204,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"recebeNotificacaoNoticia\": false,\n    \"recebeNotificacaoEdital\": true,\n    \"recebeNotificacaoOportunidade\": false\n}"
+							"raw": "{\n  \"recebeNotificacaoNoticia\": false,\n  \"recebeNotificacaoEdital\": true,\n  \"recebeNotificacaoOportunidade\": false\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/usuario/1",
+							"raw": "{{base_url}}/usuario/{{usuario_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"usuario",
-								"1"
+								"{{usuario_id}}"
 							]
 						}
 					},
@@ -89,13 +225,182 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/usuario/1",
+							"raw": "{{base_url}}/usuario/{{usuario_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"usuario",
-								"1"
+								"{{usuario_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Salvar Edital no Usuário",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/salvar_edital/{{edital_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"salvar_edital",
+								"{{edital_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dessalvar Edital do Usuário",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/dessalvar_edital/{{edital_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"dessalvar_edital",
+								"{{edital_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Salvar Oportunidade no Usuário",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/salvar_oportunidade/{{oportunidade_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"salvar_oportunidade",
+								"{{oportunidade_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dessalvar Oportunidade do Usuário",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/dessalvar_oportunidade/{{oportunidade_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"dessalvar_oportunidade",
+								"{{oportunidade_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alternar Notificação de Notícia",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/notificacao/noticia",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"notificacao",
+								"noticia"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alternar Notificação de Edital",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/notificacao/edital",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"notificacao",
+								"edital"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alternar Notificação de Oportunidade",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/notificacao/oportunidade",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"notificacao",
+								"oportunidade"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Dispositivo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"token_exemplo_dispositivo\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/usuario/{{usuario_id}}/dispositivo",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuario",
+								"{{usuario_id}}",
+								"dispositivo"
 							]
 						}
 					},
@@ -137,7 +442,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Edital de Exemplo\",\n    \"link\": \"https://exemplo.com/edital\",\n    \"texto\": \"Texto completo do edital.\"\n}"
+							"raw": "{\n  \"titulo\": \"Edital de Exemplo\",\n  \"link\": \"https://example.com/edital\",\n  \"pdf\": \"https://example.com/edital.pdf\",\n  \"formulario\": \"https://example.com/formulario\",\n  \"texto\": \"Texto completo do edital.\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/edital/",
@@ -165,16 +470,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Edital Atualizado\",\n    \"link\": \"https://exemplo.com/edital-atualizado\",\n    \"texto\": \"Texto atualizado do edital.\"\n}"
+							"raw": "{\n  \"titulo\": \"Edital Atualizado\",\n  \"link\": \"https://example.com/edital-atualizado\",\n  \"pdf\": \"https://example.com/edital-atualizado.pdf\",\n  \"formulario\": \"https://example.com/formulario-atualizado\",\n  \"texto\": \"Texto atualizado do edital.\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/edital/1",
+							"raw": "{{base_url}}/edital/{{edital_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"edital",
-								"1"
+								"{{edital_id}}"
 							]
 						}
 					},
@@ -186,13 +491,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/edital/1",
+							"raw": "{{base_url}}/edital/{{edital_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"edital",
-								"1"
+								"{{edital_id}}"
 							]
 						}
 					},
@@ -234,7 +539,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Oportunidade de Exemplo\",\n    \"cargaHoraria\": \"20h\",\n    \"requisitos\": \"Conhecimento básico em Python\",\n    \"observacoes\": \"Vaga para projeto interno.\"\n}"
+							"raw": "{\n  \"titulo\": \"Oportunidade de Exemplo\",\n  \"link_vaga\": \"https://example.com/vaga\",\n  \"cargaHoraria\": \"20h\",\n  \"requisitos\": \"Conhecimento básico em Python\",\n  \"observacoes\": \"Vaga para projeto interno.\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/oportunidade/",
@@ -262,16 +567,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Oportunidade Atualizada\",\n    \"cargaHoraria\": \"30h\",\n    \"requisitos\": \"Conhecimento intermediário em Python\",\n    \"observacoes\": \"Atualização da vaga.\"\n}"
+							"raw": "{\n  \"titulo\": \"Oportunidade Atualizada\",\n  \"link_vaga\": \"https://example.com/vaga-atualizada\",\n  \"cargaHoraria\": \"30h\",\n  \"requisitos\": \"Conhecimento intermediário em Python\",\n  \"observacoes\": \"Atualização da vaga.\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/oportunidade/1",
+							"raw": "{{base_url}}/oportunidade/{{oportunidade_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"oportunidade",
-								"1"
+								"{{oportunidade_id}}"
 							]
 						}
 					},
@@ -283,13 +588,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/oportunidade/1",
+							"raw": "{{base_url}}/oportunidade/{{oportunidade_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"oportunidade",
-								"1"
+								"{{oportunidade_id}}"
 							]
 						}
 					},
@@ -331,7 +636,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Título da notícia\",\n    \"autor\": \"Nome do autor\",\n    \"data\": \"2026-08-04T12:00:00\",\n    \"texto\": \"Conteúdo completo da notícia.\",\n    \"imagem\": \"https://exemplo.com/imagem.jpg\"\n}"
+							"raw": "{\n  \"titulo\": \"Título da notícia\",\n  \"link\": \"https://example.com/noticia\",\n  \"autor\": \"Nome do autor\",\n  \"data\": \"2026-08-18T12:00:00\",\n  \"texto\": \"Conteúdo completo da notícia.\",\n  \"imagem\": \"https://example.com/imagem.jpg\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/noticia/",
@@ -359,16 +664,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"titulo\": \"Notícia atualizada\",\n    \"autor\": \"Novo autor\",\n    \"data\": \"2026-08-04T15:30:00\",\n    \"texto\": \"Texto atualizado da notícia.\",\n    \"imagem\": \"https://exemplo.com/imagem-atualizada.jpg\"\n}"
+							"raw": "{\n  \"titulo\": \"Notícia atualizada\",\n  \"link\": \"https://example.com/noticia-atualizada\",\n  \"autor\": \"Novo autor\",\n  \"data\": \"2026-08-18T15:30:00\",\n  \"texto\": \"Texto atualizado da notícia.\",\n  \"imagem\": \"https://example.com/imagem-atualizada.jpg\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/noticia/1",
+							"raw": "{{base_url}}/noticia/{{noticia_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"noticia",
-								"1"
+								"{{noticia_id}}"
 							]
 						}
 					},
@@ -380,13 +685,90 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/noticia/1",
+							"raw": "{{base_url}}/noticia/{{noticia_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"noticia",
-								"1"
+								"{{noticia_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Busca",
+			"item": [
+				{
+					"name": "Pesquisar Notícias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/noticias?q=python",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"noticias"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "python"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pesquisar Editais",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/editais?q=bolsa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"editais"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "bolsa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pesquisar Oportunidades",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/oportunidades?q=estagio",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"oportunidades"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "estagio"
+								}
 							]
 						}
 					},
@@ -419,6 +801,36 @@
 		{
 			"key": "base_url",
 			"value": "http://127.0.0.1:5000",
+			"type": "string"
+		},
+		{
+			"key": "token_admin",
+			"value": "TOKEN_AQUI",
+			"type": "string"
+		},
+		{
+			"key": "admin_id",
+			"value": "00000000-0000-0000-0000-000000000000",
+			"type": "string"
+		},
+		{
+			"key": "usuario_id",
+			"value": "00000000-0000-0000-0000-000000000000",
+			"type": "string"
+		},
+		{
+			"key": "edital_id",
+			"value": "00000000-0000-0000-0000-000000000000",
+			"type": "string"
+		},
+		{
+			"key": "oportunidade_id",
+			"value": "00000000-0000-0000-0000-000000000000",
+			"type": "string"
+		},
+		{
+			"key": "noticia_id",
+			"value": "00000000-0000-0000-0000-000000000000",
 			"type": "string"
 		}
 	]
