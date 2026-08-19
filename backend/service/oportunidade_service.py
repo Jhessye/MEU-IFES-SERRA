@@ -86,29 +86,3 @@ def deletar_oportunidade(oportunidade_id):
     db.session.delete(oportunidade)
     db.session.commit()
     return True
-
-def salvar_oportunidade(usuario_id, oportunidade_id):
-    usuario = db.session.get(Usuario, usuario_id)   
-    oportunidade = db.session.get(Oportunidade, oportunidade_id)
-
-    if not usuario or not oportunidade:
-        return False  # Usuário ou Oportunidade não encontrado
-
-    if oportunidade not in usuario.oportunidades_salvas:
-        usuario.oportunidades_salvas.append(oportunidade)
-        db.session.commit()
-
-    return True
-
-def dessalvar_oportunidade(usuario_id, oportunidade_id):
-    usuario = db.session.get(Usuario, usuario_id)
-    oportunidade = db.session.get(Oportunidade, oportunidade_id)
-
-    if not usuario or not oportunidade:
-        return False
-
-    if oportunidade in usuario.oportunidades_salvas:
-        usuario.oportunidades_salvas.remove(oportunidade)
-        db.session.commit()
-
-    return True

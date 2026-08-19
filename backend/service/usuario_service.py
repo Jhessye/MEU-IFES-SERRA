@@ -1,5 +1,7 @@
 from backend.model.usuario import Usuario
 from backend.extensions import db
+from backend.model.edital import Edital
+from backend.model.oportunidade import Oportunidade
 
 def listar_usuarios(page=1, per_page=20):
     page = int(page or 1)
@@ -82,3 +84,55 @@ def buscar_usuario(usuario_id):
     if usuario is None:
         return None
     return usuario.to_dict()
+
+def salvar_edital(usuario_id, edital_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    edital = db.session.get(Edital, edital_id)
+
+    if not usuario or not edital:
+        return False
+
+    if edital not in usuario.editais_salvos:
+        usuario.editais_salvos.append(edital)
+        db.session.commit()
+
+    return True
+
+def dessalvar_edital(usuario_id, edital_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    edital = db.session.get(Edital, edital_id)
+
+    if not usuario or not edital:
+        return False
+
+    if edital in usuario.editais_salvos:
+        usuario.editais_salvos.remove(edital)
+        db.session.commit()
+
+    return True
+
+def salvar_oportunidade(usuario_id, oportunidade_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
+
+    if not usuario or not oportunidade:
+        return False
+
+    if oportunidade not in usuario.oportunidades_salvas:
+        usuario.oportunidades_salvas.append(oportunidade)
+        db.session.commit()
+
+    return True
+
+def dessalvar_oportunidade(usuario_id, oportunidade_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
+
+    if not usuario or not oportunidade:
+        return False
+
+    if oportunidade in usuario.oportunidades_salvas:
+        usuario.oportunidades_salvas.remove(oportunidade)
+        db.session.commit()
+
+    return True
