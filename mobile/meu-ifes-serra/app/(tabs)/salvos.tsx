@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,10 +18,6 @@ export default function SalvosScreen() {
   const router = useRouter();
   const [salvos, setSalvos] = useState<ItemSalvo[]>([]);
   const [carregando, setCarregando] = useState(true);
-
-  useEffect(() => {
-    carregarSalvos();
-  }, []);
 
   const carregarSalvos = async () => {
     try {
@@ -44,6 +40,14 @@ export default function SalvosScreen() {
       setCarregando(false);
     }
   };
+
+  // Recarrega toda vez que a tela entra em foco (primeira vez ou ao voltar pra ela)
+  useFocusEffect(
+    useCallback(() => {
+      setCarregando(true);
+      carregarSalvos();
+    }, [])
+  );
 
   const voltar = () => router.back();
 
@@ -94,7 +98,6 @@ export default function SalvosScreen() {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: colors.white,
@@ -107,31 +110,23 @@ const styles = StyleSheet.create({
 
   header: {
     flex: 1,
-
     flexDirection: 'row',
-
     alignItems: 'center',
-
     paddingHorizontal: 10,
   },
 
   backButton: {
     width: 50,
     height: 50,
-
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   headerTitle: {
     flex: 1,
-
     textAlign: 'center',
-
     fontSize: 26,
-
     fontWeight: '600',
-
     color: colors.white,
   },
 
@@ -141,49 +136,35 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-
     paddingHorizontal: 18,
-
     paddingTop: 8,
   },
 
   savedItem: {
     minHeight: 43,
-
     flexDirection: 'row',
-
     alignItems: 'center',
-
     gap: 10,
-
     borderBottomWidth: 0,
-
     paddingHorizontal: 2,
   },
 
   titleContainer: {
     flex: 1,
-
     flexDirection: 'row',
-
     alignItems: 'center',
-
     minWidth: 0,
   },
 
   itemTitle: {
     fontSize: 14,
-
     color: '#292929',
-
     flexShrink: 1,
   },
 
   expiration: {
     fontSize: 12,
-
     color: colors.red,
-
     marginLeft: 3,
   },
 });
