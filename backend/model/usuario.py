@@ -32,7 +32,6 @@ class Usuario(BaseModel):
             "recebeNotificacaoNoticia": self.recebeNotificacaoNoticia,
             "recebeNotificacaoEdital": self.recebeNotificacaoEdital,
             "recebeNotificacaoOportunidade": self.recebeNotificacaoOportunidade,
-            #devolvendo apenas os IDs dos editais e oportunidades salvos pelo usuário
-            "editais_salvos": [edital.id for edital in self.editais_salvos],
-            "oportunidades_salvas": [op.id for op in self.oportunidades_salvas]
+            "editais_salvos": [edital.to_dict() for edital in self.editais_salvos],
+            "oportunidades_salvas": [op.to_dict() for op in self.oportunidades_salvas]
         }
