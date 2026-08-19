@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+// app/(tabs)/_layout.tsx
+
+import React, { useCallback, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -56,14 +58,12 @@ export default function TabsLayout() {
   const abrirMenu = () => {
     setMenuVisible(true);
 
-    Animated.parallel([
-      Animated.timing(menuAnimation, {
-        toValue: 1,
-        duration: 380,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(menuAnimation, {
+      toValue: 1,
+      duration: 380,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
   };
 
   // ======================================================
@@ -71,27 +71,15 @@ export default function TabsLayout() {
   // ======================================================
 
   const fecharMenu = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(menuAnimation, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
+    Animated.timing(menuAnimation, {
+      toValue: 0,
+      duration: 300,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
       setMenuVisible(false);
     });
   }, [menuAnimation]);
-
-  // ======================================================
-  // SE MUDAR DE TELA, FECHA O MENU
-  // ======================================================
-
-  useEffect(() => {
-    if (menuVisible) {
-      fecharMenu();
-    }
-  }, [fecharMenu, menuVisible, pathname]);
 
   // ======================================================
   // NAVEGAR
@@ -112,13 +100,10 @@ export default function TabsLayout() {
   const falarConosco = async () => {
     fecharMenu();
 
-    const email =
-      'desenvolvedores@ifes.edu.br';
+    const email = 'desenvolvedores@ifes.edu.br';
 
     try {
-      await Linking.openURL(
-        `mailto:${email}`
-      );
+      await Linking.openURL(`mailto:${email}`);
     } catch (error) {
       console.error(
         'Erro ao abrir e-mail:',
@@ -142,6 +127,10 @@ export default function TabsLayout() {
       inputRange: [0, 1],
       outputRange: [0, 1],
     });
+
+  // ======================================================
+  // TELA
+  // ======================================================
 
   return (
     <View style={styles.container}>
@@ -169,7 +158,7 @@ export default function TabsLayout() {
             style={styles.header}
           >
 
-            {/* MENU */}
+            {/* MENU HAMBÚRGUER */}
 
             <TouchableOpacity
               style={styles.menuButton}
@@ -183,7 +172,7 @@ export default function TabsLayout() {
               />
             </TouchableOpacity>
 
-            {/* NOME */}
+            {/* NOME DO APP */}
 
             <Text style={styles.headerTitle}>
               Meu Ifes Serra
@@ -199,7 +188,7 @@ export default function TabsLayout() {
       )}
 
       {/* ==================================================
-          TABS
+          TELAS
           ================================================== */}
 
       <View style={styles.tabsContainer}>
@@ -245,7 +234,9 @@ export default function TabsLayout() {
           }}
         >
 
-          {/* NOTÍCIAS */}
+          {/* ==================================================
+              NOTÍCIAS
+              ================================================== */}
 
           <Tabs.Screen
             name="index"
@@ -265,7 +256,9 @@ export default function TabsLayout() {
             }}
           />
 
-          {/* EDITAIS */}
+          {/* ==================================================
+              EDITAIS
+              ================================================== */}
 
           <Tabs.Screen
             name="editais"
@@ -285,7 +278,9 @@ export default function TabsLayout() {
             }}
           />
 
-          {/* OPORTUNIDADES */}
+          {/* ==================================================
+              OPORTUNIDADES
+              ================================================== */}
 
           <Tabs.Screen
             name="oportunidades"
@@ -390,7 +385,9 @@ export default function TabsLayout() {
               style={styles.sideMenu}
             >
 
-              {/* ABAS */}
+              {/* ==================================================
+                  ABAS
+                  ================================================== */}
 
               <Text style={styles.sectionTitle}>
                 Abas
@@ -420,11 +417,15 @@ export default function TabsLayout() {
                 }
               />
 
-              {/* SEPARADOR */}
+              {/* ==================================================
+                  SEPARADOR
+                  ================================================== */}
 
               <View style={styles.separator} />
 
-              {/* RECURSOS */}
+              {/* ==================================================
+                  RECURSOS
+                  ================================================== */}
 
               <Text style={styles.sectionTitle}>
                 Recursos
@@ -504,6 +505,10 @@ function MenuItem({
 
 const styles = StyleSheet.create({
 
+  // ====================================================
+  // CONTAINER
+  // ====================================================
+
   container: {
     flex: 1,
     backgroundColor: colors.white,
@@ -563,7 +568,7 @@ const styles = StyleSheet.create({
   },
 
   // ====================================================
-  // MENU
+  // MENU LATERAL
   // ====================================================
 
   menuOverlay: {
@@ -626,6 +631,10 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
 
+  // ====================================================
+  // TÍTULOS DAS SEÇÕES
+  // ====================================================
+
   sectionTitle: {
     fontSize: 12,
 
@@ -637,6 +646,10 @@ const styles = StyleSheet.create({
 
     marginBottom: 8,
   },
+
+  // ====================================================
+  // ITEM
+  // ====================================================
 
   menuItem: {
     height: 43,
@@ -662,6 +675,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
+  // ====================================================
+  // SEPARADOR
+  // ====================================================
+
   separator: {
     height: 1,
 
@@ -669,4 +686,5 @@ const styles = StyleSheet.create({
 
     marginVertical: 14,
   },
+
 });
