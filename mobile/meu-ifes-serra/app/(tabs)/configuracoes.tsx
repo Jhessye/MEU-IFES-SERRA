@@ -1,197 +1,152 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Switch,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '@/theme/colors';
+import api from '@/app/services/api';
 
 export default function ConfiguracoesScreen() {
   const router = useRouter();
 
-  const [noticias, setNoticias] = useState(true);
-  const [oportunidades, setOportunidades] =
-    useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [noticias, setNoticias] = useState(false);
+  const [oportunidades, setOportunidades] = useState(false);
   const [editais, setEditais] = useState(false);
+  const [carregando, setCarregando] = useState(true);
 
-  const voltar = () => {
-    router.back();
+  useEffect(() => {
+    carregarPreferencias();
+  }, []);
+
+  const carregarPreferencias = async () => {
+    try {
+      const id = await AsyncStorage.getItem('user_id');
+      if (!id) return;
+      setUserId(id);
+
+      const { data } = await api.get(`/usuario/${id}`);
+      setNoticias(data.recebeNotificacaoNoticia);
+      setOportunidades(data.recebeNotificacaoOportunidade);
+      setEditais(data.recebeNotificacaoEdital);
+    } catch (error) {
+      console.error('Erro ao carregar preferências:', error);
+    } finally {
+      setCarregando(false);
+    }
   };
 
-  const abrirTermos = async () => {
-    // Substitua pela URL real dos termos quando tiver.
-    // await Linking.openURL('https://...');
+  const alternar = async (
+    tipo: 'noticia' | 'edital' | 'oportunidade',
+    valorAtual: boolean,
+    setter: (v: boolean) => void
+  ) => {
+    if (!userId) return;
+    setter(!valorAtual); // feedback imediato
+
+    try {
+      await api.patch(`/usuario/${userId}/notificacao/${tipo}`);
+    } catch (error) {
+      console.error(`Erro ao alternar ${tipo}:`, error);
+      setter(valorAtual); // reverte se a chamada falhar
+    }
   };
+
+  const voltar = () => router.back();
+  const abrirTermos = async () => {};
+
+  if (carregando) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.greenAccent} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-
-      {/* ==============================================
-          HEADER
-          ============================================== */}
-
       <LinearGradient
-        colors={[
-          colors.greenAccent,
-          '#7bc284',
-          '#ffffff',
-        ]}
+        colors={[colors.greenAccent, '#7bc284', '#ffffff']}
         locations={[0, 0.55, 1]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.headerGradient}
       >
-
-        <SafeAreaView
-          edges={['top']}
-          style={styles.header}
-        >
-
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={voltar}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="arrow-back"
-              size={27}
-              color={colors.red}
-            />
+        <SafeAreaView edges={['top']} style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={voltar} activeOpacity={0.7}>
+            <Ionicons name="arrow-back" size={27} color={colors.red} />
           </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>
-            Configurações
-          </Text>
-
+          <Text style={styles.headerTitle}>Configurações</Text>
           <View style={styles.headerRight} />
-
         </SafeAreaView>
-
       </LinearGradient>
 
-      {/* ==============================================
-          CONTEÚDO
-          ============================================== */}
-
       <View style={styles.content}>
-
-        {/* NOTIFICAÇÕES */}
-
-        <Text style={styles.sectionTitle}>
-          Ativar Notificações
-        </Text>
+        <Text style={styles.sectionTitle}>Ativar Notificações</Text>
 
         <NotificationRow
           label="Notícias"
           value={noticias}
-          onChange={setNoticias}
+          onChange={() => alternar('noticia', noticias, setNoticias)}
           activeColor={colors.red}
         />
-
         <NotificationRow
           label="Oportunidades"
           value={oportunidades}
-          onChange={setOportunidades}
+          onChange={() => alternar('oportunidade', oportunidades, setOportunidades)}
           activeColor={colors.red}
         />
-
         <NotificationRow
           label="Editais"
           value={editais}
-          onChange={setEditais}
+          onChange={() => alternar('edital', editais, setEditais)}
           activeColor="#222"
         />
 
-        {/* SEPARADOR */}
-
         <View style={styles.separator} />
 
-        {/* SEGURANÇA */}
-
-        <Text style={styles.sectionTitle}>
-          Segurança e Permissões
-        </Text>
-
-        <TouchableOpacity
-          style={styles.termsRow}
-          activeOpacity={0.7}
-          onPress={abrirTermos}
-        >
-
-          <Ionicons
-            name="document-text-outline"
-            size={22}
-            color="#292929"
-          />
-
-          <Text style={styles.termsText}>
-            Termos de Uso
-          </Text>
-
+        <Text style={styles.sectionTitle}>Segurança e Permissões</Text>
+        <TouchableOpacity style={styles.termsRow} activeOpacity={0.7} onPress={abrirTermos}>
+          <Ionicons name="document-text-outline" size={22} color="#292929" />
+          <Text style={styles.termsText}>Termos de Uso</Text>
         </TouchableOpacity>
-
       </View>
-
     </View>
   );
 }
 
-// ======================================================
-// SWITCH
-// ======================================================
-
-function NotificationRow({
-  label,
-  value,
-  onChange,
-  activeColor,
-}: {
-  label: string;
-  value: boolean;
-  onChange: (value: boolean) => void;
-  activeColor: string;
+function NotificationRow({ label, value, onChange, activeColor }: {
+  label: string; value: boolean; onChange: () => void; activeColor: string;
 }) {
   return (
     <View style={styles.notificationRow}>
-
-      <Text
-        style={[
-          styles.notificationLabel,
-          {
-            color: value
-              ? activeColor
-              : '#222',
-          },
-        ]}
-      >
-        {label}
-      </Text>
-
+      <Text style={[styles.notificationLabel, { color: value ? activeColor : '#222' }]}>{label}</Text>
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{
-          false: '#D9D9D9',
-          true: '#4CC463',
-        }}
+        trackColor={{ false: '#D9D9D9', true: '#4CC463' }}
         thumbColor={colors.white}
         ios_backgroundColor="#D9D9D9"
       />
-
     </View>
   );
 }
+
+// ...os `styles` que você já tinha continuam iguais, sem mudança
 
 const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    backgroundColor: colors.white,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: colors.white,
   },
 
