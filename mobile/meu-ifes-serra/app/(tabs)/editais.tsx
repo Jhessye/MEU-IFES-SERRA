@@ -10,6 +10,8 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '@/theme/colors';
 import api from '@/app/services/api';
 
@@ -23,15 +25,33 @@ type Edital = {
 };
 
 export default function EditaisScreen() {
+  const navigation = useNavigation();
   const [editais, setEditais] = useState<Edital[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [search, setSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
+  const [userId, setUserId] = useState<string | null>(null);
+  const [salvos, setSalvos] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     buscarEditais();
+    AsyncStorage.getItem('user_id').then((id) => {
+      setUserId(id);
+      if (id) carregarSalvos(id);
+    });
   }, []);
+
+  // Recarrega a lista e os salvos quando a tela volta a receber foco.
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setSearch('');
+      buscarEditais();
+      if (userId) carregarSalvos(userId);
+    });
+    return unsubscribe;
+  }, [navigation, userId]);
 
   // ==================================================
   // BUSCAR EDITAIS
@@ -88,6 +108,54 @@ export default function EditaisScreen() {
       console.error('Erro ao pesquisar editais:', error);
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  // ==================================================
+  // SALVOS
+  // ==================================================
+
+  const carregarSalvos = async (id: string) => {
+    try {
+      const { data } = await api.get(`/usuario/${id}`);
+      const ids = (data.editais_salvos || []).map((e: any) => e.id);
+      setSalvos(new Set(ids));
+    } catch (error) {
+      console.error('Erro ao carregar editais salvos:', error);
+    }
+  };
+
+  const alternarSalvo = async (editalId: string) => {
+    if (!userId) return;
+    const jaSalvo = salvos.has(editalId);
+
+    setSalvos((prev) => {
+      const novo = new Set(prev);
+      if (jaSalvo) {
+        novo.delete(editalId);
+      } else {
+        novo.add(editalId);
+      }
+      return novo;
+    });
+
+    try {
+      if (jaSalvo) {
+        await api.delete(`/usuario/${userId}/dessalvar_edital/${editalId}`);
+      } else {
+        await api.post(`/usuario/${userId}/salvar_edital/${editalId}`);
+      }
+    } catch (error) {
+      console.error('Erro ao salvar edital:', error);
+      setSalvos((prev) => {
+        const novo = new Set(prev);
+        if (jaSalvo) {
+          novo.add(editalId);
+        } else {
+          novo.delete(editalId);
+        }
+        return novo;
+      });
     }
   };
 
@@ -167,6 +235,8 @@ export default function EditaisScreen() {
           <EditalCard
             edital={item}
             abrirLink={abrirLink}
+            salvo={salvos.has(item.id)}
+            onToggleSalvo={() => alternarSalvo(item.id)}
           />
         )}
         ItemSeparatorComponent={() => (
@@ -197,9 +267,13 @@ export default function EditaisScreen() {
 function EditalCard({
   edital,
   abrirLink,
+  salvo,
+  onToggleSalvo,
 }: {
   edital: Edital;
   abrirLink: (url?: string | null) => void;
+  salvo: boolean;
+  onToggleSalvo: () => void;
 }) {
   return (
     <View style={styles.card}>
@@ -209,11 +283,12 @@ function EditalCard({
       <TouchableOpacity
         style={styles.bookmarkButton}
         activeOpacity={0.7}
+        onPress={onToggleSalvo}
       >
         <Ionicons
-          name="bookmark-outline"
+          name={salvo ? 'bookmark' : 'bookmark-outline'}
           size={23}
-          color="#202020"
+          color={salvo ? colors.red : '#202020'}
         />
       </TouchableOpacity>
 
@@ -295,29 +370,18 @@ const styles = StyleSheet.create({
 
   searchContainer: {
     height: 38,
-
     backgroundColor: colors.white,
-
     borderRadius: 20,
-
     borderWidth: 1,
     borderColor: '#E0E0E0',
-
     flexDirection: 'row',
     alignItems: 'center',
-
     paddingHorizontal: 13,
-
     marginBottom: 8,
-
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 3,
-
     elevation: 1,
   },
 

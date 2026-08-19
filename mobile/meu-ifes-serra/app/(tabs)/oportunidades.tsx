@@ -10,6 +10,8 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '@/theme/colors';
 import api from '@/app/services/api';
 
@@ -26,6 +28,7 @@ type Oportunidade = {
 };
 
 export default function OportunidadesScreen() {
+  const navigation = useNavigation();
   const [oportunidades, setOportunidades] =
     useState<Oportunidade[]>([]);
 
@@ -39,9 +42,26 @@ export default function OportunidadesScreen() {
   const [expandedId, setExpandedId] =
     useState<string | null>(null);
 
+  const [userId, setUserId] = useState<string | null>(null);
+  const [salvos, setSalvos] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     buscarOportunidades();
+    AsyncStorage.getItem('user_id').then((id) => {
+      setUserId(id);
+      if (id) carregarSalvos(id);
+    });
   }, []);
+
+  // Recarrega a lista e os salvos quando a tela volta a receber foco.
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setSearch('');
+      buscarOportunidades();
+      if (userId) carregarSalvos(userId);
+    });
+    return unsubscribe;
+  }, [navigation, userId]);
 
   // ==================================================
   // BUSCAR OPORTUNIDADES
@@ -113,6 +133,54 @@ export default function OportunidadesScreen() {
       );
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  // ==================================================
+  // SALVOS
+  // ==================================================
+
+  const carregarSalvos = async (id: string) => {
+    try {
+      const { data } = await api.get(`/usuario/${id}`);
+      const ids = (data.oportunidades_salvas || []).map((o: any) => o.id);
+      setSalvos(new Set(ids));
+    } catch (error) {
+      console.error('Erro ao carregar oportunidades salvas:', error);
+    }
+  };
+
+  const alternarSalvo = async (oportunidadeId: string) => {
+    if (!userId) return;
+    const jaSalvo = salvos.has(oportunidadeId);
+
+    setSalvos((prev) => {
+      const novo = new Set(prev);
+      if (jaSalvo) {
+        novo.delete(oportunidadeId);
+      } else {
+        novo.add(oportunidadeId);
+      }
+      return novo;
+    });
+
+    try {
+      if (jaSalvo) {
+        await api.delete(`/usuario/${userId}/dessalvar_oportunidade/${oportunidadeId}`);
+      } else {
+        await api.post(`/usuario/${userId}/salvar_oportunidade/${oportunidadeId}`);
+      }
+    } catch (error) {
+      console.error('Erro ao salvar oportunidade:', error);
+      setSalvos((prev) => {
+        const novo = new Set(prev);
+        if (jaSalvo) {
+          novo.add(oportunidadeId);
+        } else {
+          novo.delete(oportunidadeId);
+        }
+        return novo;
+      });
     }
   };
 
@@ -201,6 +269,8 @@ export default function OportunidadesScreen() {
               );
             }}
             abrirVaga={abrirVaga}
+            salvo={salvos.has(item.id)}
+            onToggleSalvo={() => alternarSalvo(item.id)}
           />
         )}
         ItemSeparatorComponent={() => (
@@ -233,11 +303,15 @@ function OportunidadeCard({
   expanded,
   onPress,
   abrirVaga,
+  salvo,
+  onToggleSalvo,
 }: {
   oportunidade: Oportunidade;
   expanded: boolean;
   onPress: () => void;
   abrirVaga: (url: string) => void;
+  salvo: boolean;
+  onToggleSalvo: () => void;
 }) {
   return (
     <View style={styles.card}>
@@ -250,20 +324,14 @@ function OportunidadeCard({
         onPress={onPress}
       >
 
-        <Ionicons
-          name={
-            expanded
-              ? 'bookmark'
-              : 'bookmark-outline'
-          }
-          size={22}
-          color={
-            expanded
-              ? colors.red
-              : '#222'
-          }
-          style={styles.bookmark}
-        />
+        <TouchableOpacity onPress={onToggleSalvo} hitSlop={8}>
+          <Ionicons
+            name={salvo ? 'bookmark' : 'bookmark-outline'}
+            size={22}
+            color={salvo ? colors.red : '#222'}
+            style={styles.bookmark}
+          />
+        </TouchableOpacity>
 
         <View style={styles.titleArea}>
           <Text
@@ -402,29 +470,18 @@ const styles = StyleSheet.create({
 
   searchContainer: {
     height: 38,
-
     backgroundColor: colors.white,
-
     borderRadius: 20,
-
     borderWidth: 1,
     borderColor: '#E0E0E0',
-
     flexDirection: 'row',
     alignItems: 'center',
-
     paddingHorizontal: 13,
-
     marginBottom: 8,
-
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 3,
-
     elevation: 1,
   },
 
@@ -445,21 +502,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E8E8E8',
   },
 
-  // ----------------------------------------------------
-  // CARD
-  // ----------------------------------------------------
-
   card: {
     backgroundColor: colors.white,
   },
 
   mainRow: {
     minHeight: 46,
-
     flexDirection: 'row',
-
     alignItems: 'center',
-
     paddingVertical: 8,
   },
 
@@ -470,159 +520,106 @@ const styles = StyleSheet.create({
 
   titleArea: {
     flex: 1,
-
     flexDirection: 'row',
-
     alignItems: 'center',
-
     minWidth: 0,
   },
 
   title: {
     flexShrink: 1,
-
     fontSize: 11,
-
     fontWeight: '700',
-
     color: '#222',
-
     marginRight: 4,
   },
 
   expiration: {
     fontSize: 10,
-
     color: colors.red,
-
     flexShrink: 0,
   },
 
   detailText: {
     fontSize: 12,
-
     color: '#999',
-
     marginLeft: 8,
-
     marginRight: 4,
   },
 
-  // ----------------------------------------------------
-  // EXPANDIDO
-  // ----------------------------------------------------
-
   expandedContent: {
     paddingHorizontal: 4,
-
     paddingTop: 4,
-
     paddingBottom: 13,
   },
 
   aboutTitle: {
     textAlign: 'center',
-
     fontSize: 12,
-
     fontWeight: '600',
-
     color: '#222',
-
     marginBottom: 10,
   },
 
   infoRow: {
     flexDirection: 'row',
-
     marginBottom: 4,
   },
 
   infoLabel: {
     fontSize: 9.5,
-
     fontWeight: '700',
-
     color: '#777',
-
     width: 100,
   },
 
   infoValue: {
     flex: 1,
-
     fontSize: 9.5,
-
     fontWeight: '500',
-
     color: '#777',
   },
 
   linkRow: {
     flexDirection: 'row',
-
     marginTop: 4,
-
     alignItems: 'center',
   },
 
   linkLabel: {
     fontSize: 9.5,
-
     fontWeight: '700',
-
     color: '#777',
-
     marginRight: 4,
   },
 
   link: {
     fontSize: 9.5,
-
     fontWeight: '700',
-
     color: colors.greenAccent,
-
     textDecorationLine: 'underline',
   },
 
-  // ----------------------------------------------------
-  // LOADING
-  // ----------------------------------------------------
-
   loadingContainer: {
     flex: 1,
-
     justifyContent: 'center',
-
     alignItems: 'center',
-
     backgroundColor: colors.white,
   },
 
   loadingText: {
     marginTop: 10,
-
     fontSize: 14,
-
     color: '#777',
   },
 
-  // ----------------------------------------------------
-  // VAZIO
-  // ----------------------------------------------------
-
   emptyContainer: {
     alignItems: 'center',
-
     paddingTop: 80,
   },
 
   emptyText: {
     marginTop: 12,
-
     fontSize: 14,
-
     color: '#999',
   },
 });
