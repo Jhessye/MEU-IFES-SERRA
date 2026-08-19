@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,16 @@ import {
   Pressable,
   Linking,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
-import { Tabs, useRouter } from 'expo-router';
+
+import {
+  Tabs,
+  useRouter,
+  usePathname,
+} from 'expo-router';
+
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/theme/colors';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,26 +24,85 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
+const MENU_WIDTH = width * 0.78;
+
 export default function TabsLayout() {
   const router = useRouter();
-
-  const [menuVisible, setMenuVisible] = useState(false);
+  const pathname = usePathname();
 
   // ======================================================
   // MENU
   // ======================================================
 
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const menuAnimation = useRef(
+    new Animated.Value(0)
+  ).current;
+
+  // ======================================================
+  // VERIFICA SE É UMA TELA DE RECURSO
+  // ======================================================
+
+  const isResourceScreen =
+    pathname.endsWith('/perfil') ||
+    pathname.endsWith('/configuracoes') ||
+    pathname.endsWith('/salvos');
+
+  // ======================================================
+  // ABRIR MENU
+  // ======================================================
+
   const abrirMenu = () => {
     setMenuVisible(true);
+
+    Animated.parallel([
+      Animated.timing(menuAnimation, {
+        toValue: 1,
+        duration: 380,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
+
+  // ======================================================
+  // FECHAR MENU
+  // ======================================================
 
   const fecharMenu = () => {
-    setMenuVisible(false);
+    Animated.parallel([
+      Animated.timing(menuAnimation, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setMenuVisible(false);
+    });
   };
 
+  // ======================================================
+  // SE MUDAR DE TELA, FECHA O MENU
+  // ======================================================
+
+  useEffect(() => {
+    if (menuVisible) {
+      fecharMenu();
+    }
+  }, [pathname]);
+
+  // ======================================================
+  // NAVEGAR
+  // ======================================================
+
   const navegar = (rota: string) => {
-    setMenuVisible(false);
-    router.push(rota as any);
+    fecharMenu();
+
+    setTimeout(() => {
+      router.push(rota as any);
+    }, 100);
   };
 
   // ======================================================
@@ -43,66 +110,93 @@ export default function TabsLayout() {
   // ======================================================
 
   const falarConosco = async () => {
-    setMenuVisible(false);
+    fecharMenu();
 
-    const email = 'desenvolvedores@ifes.edu.br';
+    const email =
+      'desenvolvedores@ifes.edu.br';
 
     try {
-      await Linking.openURL(`mailto:${email}`);
+      await Linking.openURL(
+        `mailto:${email}`
+      );
     } catch (error) {
-      console.error('Erro ao abrir e-mail:', error);
+      console.error(
+        'Erro ao abrir e-mail:',
+        error
+      );
     }
   };
+
+  // ======================================================
+  // ANIMAÇÕES
+  // ======================================================
+
+  const menuTranslateX =
+    menuAnimation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [-MENU_WIDTH, 0],
+    });
+
+  const overlayOpacity =
+    menuAnimation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1],
+    });
 
   return (
     <View style={styles.container}>
 
       {/* ==================================================
-          HEADER GLOBAL
+          HEADER PRINCIPAL
+          SÓ APARECE NAS TELAS PRINCIPAIS
           ================================================== */}
 
-      <LinearGradient
-        colors={[
-          colors.greenAccent,
-          '#7bc284',
-          '#ffffff',
-        ]}
-        locations={[0, 0.55, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.headerGradient}
-      >
-        <SafeAreaView
-          edges={['top']}
-          style={styles.header}
+      {!isResourceScreen && (
+        <LinearGradient
+          colors={[
+            colors.greenAccent,
+            '#7bc284',
+            '#ffffff',
+          ]}
+          locations={[0, 0.55, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.headerGradient}
         >
 
-          {/* MENU HAMBÚRGUER */}
-
-          <TouchableOpacity
-            style={styles.menuButton}
-            activeOpacity={0.7}
-            onPress={abrirMenu}
+          <SafeAreaView
+            edges={['top']}
+            style={styles.header}
           >
-            <Ionicons
-              name="menu-outline"
-              size={38}
-              color={colors.greenDark}
-            />
-          </TouchableOpacity>
 
-          {/* NOME DO APP */}
+            {/* MENU */}
 
-          <Text style={styles.headerTitle}>
-            Meu Ifes Serra
-          </Text>
+            <TouchableOpacity
+              style={styles.menuButton}
+              activeOpacity={0.7}
+              onPress={abrirMenu}
+            >
+              <Ionicons
+                name="menu-outline"
+                size={38}
+                color={colors.greenDark}
+              />
+            </TouchableOpacity>
 
-          {/* ESPAÇO PARA CENTRALIZAR */}
+            {/* NOME */}
 
-          <View style={styles.headerRight} />
+            <Text style={styles.headerTitle}>
+              Meu Ifes Serra
+            </Text>
 
-        </SafeAreaView>
-      </LinearGradient>
+            {/* ESPAÇO PARA CENTRALIZAR */}
+
+            <View style={styles.headerRight} />
+
+          </SafeAreaView>
+
+        </LinearGradient>
+      )}
 
       {/* ==================================================
           TABS
@@ -151,16 +245,17 @@ export default function TabsLayout() {
           }}
         >
 
-          {/* ==================================================
-              NOTÍCIAS
-              ================================================== */}
+          {/* NOTÍCIAS */}
 
           <Tabs.Screen
             name="index"
             options={{
               title: 'Notícias',
 
-              tabBarIcon: ({ color, size }) => (
+              tabBarIcon: ({
+                color,
+                size,
+              }) => (
                 <Ionicons
                   name="newspaper-outline"
                   size={size}
@@ -170,16 +265,17 @@ export default function TabsLayout() {
             }}
           />
 
-          {/* ==================================================
-              EDITAIS
-              ================================================== */}
+          {/* EDITAIS */}
 
           <Tabs.Screen
             name="editais"
             options={{
               title: 'Editais',
 
-              tabBarIcon: ({ color, size }) => (
+              tabBarIcon: ({
+                color,
+                size,
+              }) => (
                 <Ionicons
                   name="document-text-outline"
                   size={size}
@@ -189,16 +285,17 @@ export default function TabsLayout() {
             }}
           />
 
-          {/* ==================================================
-              OPORTUNIDADES
-              ================================================== */}
+          {/* OPORTUNIDADES */}
 
           <Tabs.Screen
             name="oportunidades"
             options={{
               title: 'Oportunidades',
 
-              tabBarIcon: ({ color, size }) => (
+              tabBarIcon: ({
+                color,
+                size,
+              }) => (
                 <Ionicons
                   name="briefcase-outline"
                   size={size}
@@ -209,10 +306,8 @@ export default function TabsLayout() {
           />
 
           {/* ==================================================
-              TELAS DE RECURSOS
-              
-              Elas existem dentro do Tabs para manter
-              o footer, mas NÃO aparecem no footer.
+              RECURSOS
+              NÃO APARECEM NO FOOTER
               ================================================== */}
 
           <Tabs.Screen
@@ -245,79 +340,122 @@ export default function TabsLayout() {
           ================================================== */}
 
       {menuVisible && (
-        <View style={styles.menuOverlay}>
+        <View
+          style={styles.menuOverlay}
+          pointerEvents="box-none"
+        >
 
-          {/* ÁREA ESCURA FORA DO MENU */}
+          {/* ==================================================
+              FUNDO ESCURO
+              ================================================== */}
 
-          <Pressable
-            style={styles.overlayTouchable}
-            onPress={fecharMenu}
-          />
-
-          {/* MENU */}
-
-          <SafeAreaView
-            edges={['top', 'bottom']}
-            style={styles.sideMenu}
+          <Animated.View
+            style={[
+              styles.overlayContainer,
+              {
+                opacity: overlayOpacity,
+              },
+            ]}
           >
 
-            {/* ==========================================
-                ABAS
-                ========================================== */}
-
-            <Text style={styles.sectionTitle}>
-              Abas
-            </Text>
-
-            <MenuItem
-              icon="newspaper"
-              label="Notícias"
-              onPress={() => navegar('/')}
+            <Pressable
+              style={styles.overlayTouchable}
+              onPress={fecharMenu}
             />
 
-            <MenuItem
-              icon="document-text-outline"
-              label="Editais"
-              onPress={() => navegar('/editais')}
-            />
+          </Animated.View>
 
-            <MenuItem
-              icon="briefcase-outline"
-              label="Oportunidades"
-              onPress={() => navegar('/oportunidades')}
-            />
+          {/* ==================================================
+              MENU
+              ================================================== */}
 
-            {/* SEPARADOR */}
+          <Animated.View
+            style={[
+              styles.sideMenuWrapper,
+              {
+                width: MENU_WIDTH,
 
-            <View style={styles.separator} />
+                transform: [
+                  {
+                    translateX:
+                      menuTranslateX,
+                  },
+                ],
+              },
+            ]}
+          >
 
-            {/* ==========================================
-                RECURSOS
-                ========================================== */}
+            <SafeAreaView
+              edges={['top', 'bottom']}
+              style={styles.sideMenu}
+            >
 
-            <Text style={styles.sectionTitle}>
-              Recursos
-            </Text>
+              {/* ABAS */}
 
-            <MenuItem
-              icon="person-outline"
-              label="Perfil"
-              onPress={() => navegar('/perfil')}
-            />
+              <Text style={styles.sectionTitle}>
+                Abas
+              </Text>
 
-            <MenuItem
-              icon="settings-outline"
-              label="Configurações"
-              onPress={() => navegar('/configuracoes')}
-            />
+              <MenuItem
+                icon="newspaper"
+                label="Notícias"
+                onPress={() =>
+                  navegar('/')
+                }
+              />
 
-            <MenuItem
-              icon="chatbubble-outline"
-              label="Fale conosco"
-              onPress={falarConosco}
-            />
+              <MenuItem
+                icon="document-text-outline"
+                label="Editais"
+                onPress={() =>
+                  navegar('/editais')
+                }
+              />
 
-          </SafeAreaView>
+              <MenuItem
+                icon="briefcase-outline"
+                label="Oportunidades"
+                onPress={() =>
+                  navegar('/oportunidades')
+                }
+              />
+
+              {/* SEPARADOR */}
+
+              <View style={styles.separator} />
+
+              {/* RECURSOS */}
+
+              <Text style={styles.sectionTitle}>
+                Recursos
+              </Text>
+
+              <MenuItem
+                icon="person-outline"
+                label="Perfil"
+                onPress={() =>
+                  navegar('/perfil')
+                }
+              />
+
+              <MenuItem
+                icon="settings-outline"
+                label="Configurações"
+                onPress={() =>
+                  navegar('/configuracoes')
+                }
+              />
+
+              <MenuItem
+                icon="chatbubble-outline"
+                label="Fale conosco"
+                onPress={falarConosco}
+              />
+
+            </SafeAreaView>
+
+          </Animated.View>
+
         </View>
       )}
 
@@ -425,7 +563,7 @@ const styles = StyleSheet.create({
   },
 
   // ====================================================
-  // MENU LATERAL
+  // MENU
   // ====================================================
 
   menuOverlay: {
@@ -436,27 +574,50 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
 
-    flexDirection: 'row',
-
     zIndex: 1000,
-
     elevation: 1000,
+  },
+
+  overlayContainer: {
+    position: 'absolute',
+
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 
   overlayTouchable: {
     flex: 1,
 
-    backgroundColor: 'rgba(0, 0, 0, 0.20)',
+    backgroundColor:
+      'rgba(0, 0, 0, 0.22)',
   },
 
-  sideMenu: {
+  sideMenuWrapper: {
     position: 'absolute',
 
     left: 0,
     top: 0,
     bottom: 0,
 
-    width: width * 0.78,
+    backgroundColor: colors.white,
+
+    shadowColor: '#000',
+
+    shadowOffset: {
+      width: 3,
+      height: 0,
+    },
+
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+
+    elevation: 12,
+  },
+
+  sideMenu: {
+    flex: 1,
 
     backgroundColor: colors.white,
 
@@ -475,8 +636,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
 
     marginBottom: 8,
-
-    paddingHorizontal: 0,
   },
 
   menuItem: {
