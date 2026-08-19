@@ -11,6 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/theme/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/app/services/api';
 
 export default function PerfilScreen() {
   const router = useRouter();
@@ -46,24 +48,30 @@ export default function PerfilScreen() {
 
   const excluirConta = () => {
     Alert.alert(
-      'Excluir conta',
-      'Essa ação não poderá ser desfeita.',
-      [
+        'Excluir conta',
+        'Essa ação não poderá ser desfeita.',
+        [
+        { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Cancelar',
-          style: 'cancel',
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: async () => {
+            try {
+                const id = await AsyncStorage.getItem('user_id');
+                if (id) {
+                await api.delete(`/usuario/${id}`);
+                }
+                await AsyncStorage.clear();
+                router.replace('/(onboarding)/welcome');
+            } catch (error) {
+                console.error('Erro ao excluir conta:', error);
+                Alert.alert('Erro', 'Não foi possível excluir sua conta. Tente novamente.');
+            }
+            },
         },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => {
-            // futuramente:
-            // chamar API para excluir conta
-          },
-        },
-      ]
+        ]
     );
-  };
+ };
 
   return (
     <View style={styles.container}>
