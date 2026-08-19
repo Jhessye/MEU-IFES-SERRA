@@ -76,3 +76,9 @@ def registrar_dispositivo(usuario_id, token):
     usuario.fcm_token = token
     db.session.commit()
     return True
+
+def buscar_usuario(usuario_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    if usuario is None:
+        return None
+    return usuario.to_dict()

@@ -12,6 +12,13 @@ def listar_usuarios():
     usuarios = usuario_service.listar_usuarios()
     return jsonify(usuarios), 200
 
+@usuario_bp.route('/<uuid:usuario_id>', methods=['GET'])
+def buscar_usuario(usuario_id):
+    usuario = usuario_service.buscar_usuario(usuario_id)
+    if usuario is None:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+    return jsonify(usuario), 200
+
 @usuario_bp.route('/', methods=['POST'])
 @usuario_bp.input(UsuarioInSchema)
 def criar_usuario(json_data):
