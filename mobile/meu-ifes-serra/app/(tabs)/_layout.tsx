@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -70,7 +70,7 @@ export default function TabsLayout() {
   // FECHAR MENU
   // ======================================================
 
-  const fecharMenu = () => {
+  const fecharMenu = useCallback(() => {
     Animated.parallel([
       Animated.timing(menuAnimation, {
         toValue: 0,
@@ -81,7 +81,7 @@ export default function TabsLayout() {
     ]).start(() => {
       setMenuVisible(false);
     });
-  };
+  }, [menuAnimation]);
 
   // ======================================================
   // SE MUDAR DE TELA, FECHA O MENU
@@ -91,7 +91,7 @@ export default function TabsLayout() {
     if (menuVisible) {
       fecharMenu();
     }
-  }, [pathname]);
+  }, [fecharMenu, menuVisible, pathname]);
 
   // ======================================================
   // NAVEGAR

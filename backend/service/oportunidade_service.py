@@ -2,9 +2,10 @@ from backend.model.oportunidade import Oportunidade
 from backend.extensions import db
 from backend.model.usuario import Usuario
 from backend.service import notificacao_service
+from datetime import date
 
-def calcular_dias_inscricao(data_inicio, data_fim):
-    return (data_fim - data_inicio).days
+def calcular_dias_inscricao(data_fim, data_atual=None):
+    return (data_fim - (data_atual or date.today())).days
 
 def listar_oportunidades(page=1, per_page=20):
     page = int(page or 1)
@@ -24,13 +25,12 @@ def criar_oportunidade(data):
         carga_horaria = data.get("cargaHoraria")
         requisitos = data.get("requisitos")
         observacoes = data.get("observacoes")
-        data_inicio = data.get("dataInicioInscricao")
         data_fim = data.get("dataFinalInscricao")
 
-        if not titulo or not carga_horaria or not requisitos or not data_inicio or not data_fim:
+        if not titulo or not carga_horaria or not requisitos or not data_fim:
             return None #dados incompletos
 
-        if calcular_dias_inscricao(data_inicio, data_fim) < 0:
+        if calcular_dias_inscricao(data_fim) < 0:
             return None #dados incompletos
 
         nova_oportunidade = Oportunidade(
@@ -39,7 +39,6 @@ def criar_oportunidade(data):
             cargaHoraria=carga_horaria,
             requisitos=requisitos,
             observacoes=observacoes,
-            dataInicioInscricao=data_inicio,
             dataFinalInscricao=data_fim
         )
         db.session.add(nova_oportunidade)
@@ -60,13 +59,12 @@ def atualizar_oportunidade(oportunidade_id, data):
         carga_horaria = data.get("cargaHoraria")
         requisitos = data.get("requisitos")
         observacoes = data.get("observacoes")
-        data_inicio = data.get("dataInicioInscricao")
         data_fim = data.get("dataFinalInscricao")
 
-        if not titulo or not carga_horaria or not requisitos or not data_inicio or not data_fim:
+        if not titulo or not carga_horaria or not requisitos or not data_fim:
             return None #dados incompletos
 
-        if calcular_dias_inscricao(data_inicio, data_fim) < 0:
+        if calcular_dias_inscricao(data_fim) < 0:
             return None #dados incompletos
 
         oportunidade.titulo = titulo
@@ -74,7 +72,6 @@ def atualizar_oportunidade(oportunidade_id, data):
         oportunidade.cargaHoraria = carga_horaria
         oportunidade.requisitos = requisitos
         oportunidade.observacoes = observacoes
-        oportunidade.dataInicioInscricao = data_inicio
         oportunidade.dataFinalInscricao = data_fim
 
         db.session.commit()

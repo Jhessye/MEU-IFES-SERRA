@@ -539,7 +539,7 @@
 						],
 						"body": {
 							"mode": "raw",
-    							"raw": "{\n  \"titulo\": \"Oportunidade de Exemplo\",\n  \"link_vaga\": \"https://example.com/vaga\",\n  \"cargaHoraria\": \"20h\",\n  \"requisitos\": \"Conhecimento básico em Python\",\n  \"observacoes\": \"Vaga para projeto interno.\",\n  \"dataInicioInscricao\": \"2026-08-01\",\n  \"dataFinalInscricao\": \"2026-08-31\"\n}"
+    							"raw": "{\n  \"titulo\": \"Oportunidade de Exemplo\",\n  \"link_vaga\": \"https://example.com/vaga\",\n  \"cargaHoraria\": \"20h\",\n  \"requisitos\": \"Conhecimento básico em Python\",\n  \"observacoes\": \"Vaga para projeto interno.\",\n  \"dataFinalInscricao\": \"2026-08-31\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/oportunidade/",
@@ -567,7 +567,7 @@
 						],
 						"body": {
 							"mode": "raw",
-    							"raw": "{\n  \"titulo\": \"Oportunidade Atualizada\",\n  \"link_vaga\": \"https://example.com/vaga-atualizada\",\n  \"cargaHoraria\": \"30h\",\n  \"requisitos\": \"Conhecimento intermediário em Python\",\n  \"observacoes\": \"Atualização da vaga.\",\n  \"dataInicioInscricao\": \"2026-08-05\",\n  \"dataFinalInscricao\": \"2026-09-05\"\n}"
+    							"raw": "{\n  \"titulo\": \"Oportunidade Atualizada\",\n  \"link_vaga\": \"https://example.com/vaga-atualizada\",\n  \"cargaHoraria\": \"30h\",\n  \"requisitos\": \"Conhecimento intermediário em Python\",\n  \"observacoes\": \"Atualização da vaga.\",\n  \"dataFinalInscricao\": \"2026-09-05\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/oportunidade/{{oportunidade_id}}",

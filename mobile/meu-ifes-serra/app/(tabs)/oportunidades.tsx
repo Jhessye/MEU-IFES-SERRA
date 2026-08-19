@@ -20,7 +20,7 @@ type Oportunidade = {
   cargaHoraria?: string | null;
   requisitos?: string | null;
   observacoes?: string | null;
-  dataInicioInscricao: string;
+  dataAtual: string;
   dataFinalInscricao: string;
   diasInscricao: number;
 };
@@ -319,7 +319,7 @@ function OportunidadeCard({
 
           <InfoRow
             label="Período de inscrição:"
-            value={`${oportunidade.dataInicioInscricao} até ${oportunidade.dataFinalInscricao} (${oportunidade.diasInscricao} dias)`}
+            value={`${oportunidade.dataAtual} até ${oportunidade.dataFinalInscricao} (${oportunidade.diasInscricao} dias)`}
           />
 
           <InfoRow
