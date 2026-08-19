@@ -20,6 +20,9 @@ type Oportunidade = {
   cargaHoraria?: string | null;
   requisitos?: string | null;
   observacoes?: string | null;
+  dataInicioInscricao: string;
+  dataFinalInscricao: string;
+  diasInscricao: number;
 };
 
 export default function OportunidadesScreen() {
@@ -271,7 +274,8 @@ function OportunidadeCard({
           </Text>
 
           <Text style={styles.expiration}>
-            expira em 30 dias
+            inscrição por {oportunidade.diasInscricao}{' '}
+            {oportunidade.diasInscricao === 1 ? 'dia' : 'dias'}
           </Text>
         </View>
 
@@ -311,6 +315,11 @@ function OportunidadeCard({
               oportunidade.cargaHoraria ||
               '-'
             }
+          />
+
+          <InfoRow
+            label="Período de inscrição:"
+            value={`${oportunidade.dataInicioInscricao} até ${oportunidade.dataFinalInscricao} (${oportunidade.diasInscricao} dias)`}
           />
 
           <InfoRow

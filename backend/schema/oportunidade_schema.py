@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String
+from apiflask.fields import Date, String
 from apiflask.validators import Length, URL
 
 
@@ -9,3 +9,5 @@ class OportunidadeInSchema(Schema):
     cargaHoraria = String(required=True, validate=Length(min=1, max=100))
     requisitos = String(required=True, validate=Length(min=1))
     observacoes = String(required=False, allow_none=True)
+    dataInicioInscricao = Date(required=True)
+    dataFinalInscricao = Date(required=True)

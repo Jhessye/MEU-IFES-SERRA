@@ -10,6 +10,11 @@ class Oportunidade(BaseModel):
     cargaHoraria = db.Column(db.String(100), nullable=True)
     requisitos = db.Column(db.Text, nullable=True)
     observacoes = db.Column(db.Text, nullable=True)
+    dataInicioInscricao = db.Column(db.Date, nullable=False)
+    dataFinalInscricao = db.Column(db.Date, nullable=False)
+
+    def dias_inscricao(self):
+        return (self.dataFinalInscricao - self.dataInicioInscricao).days
 
     def to_dict(self):
         return {
@@ -19,4 +24,7 @@ class Oportunidade(BaseModel):
             "cargaHoraria": self.cargaHoraria,
             "requisitos": self.requisitos,
             "observacoes": self.observacoes,
+            "dataInicioInscricao": self.dataInicioInscricao.isoformat(),
+            "dataFinalInscricao": self.dataFinalInscricao.isoformat(),
+            "diasInscricao": self.dias_inscricao(),
         }
