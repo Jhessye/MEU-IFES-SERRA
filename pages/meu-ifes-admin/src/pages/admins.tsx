@@ -16,7 +16,7 @@ export const AdminsPage: React.FC = () => {
   const carregarAdmins = useCallback(async () => {
     try {
       const res = await api.get('/admin/');
-      setAdmins(res.data);
+      setAdmins(Array.isArray(res.data?.items) ? res.data.items : []);
     } catch (err) {
       console.error('Erro ao carregar administradores:', err);
     }
@@ -29,7 +29,7 @@ export const AdminsPage: React.FC = () => {
       try {
         const res = await api.get('/admin/');
         if (active) {
-          setAdmins(res.data);
+          setAdmins(Array.isArray(res.data?.items) ? res.data.items : []);
         }
       } catch (err) {
         console.error('Erro ao carregar administradores:', err);

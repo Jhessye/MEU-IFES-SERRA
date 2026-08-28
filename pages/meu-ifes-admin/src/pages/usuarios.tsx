@@ -21,7 +21,7 @@ export const UsuariosPage: React.FC = () => {
       try {
         const res = await api.get('/usuario/');
         if (active) {
-          setUsuarios(res.data);
+          setUsuarios(Array.isArray(res.data?.items) ? res.data.items : []);
         }
       } catch (err) {
         console.error('Erro ao carregar usuários:', err);

@@ -19,7 +19,7 @@ export const EditaisPage: React.FC = () => {
   const carregarEditais = useCallback(async () => {
     try {
       const res = await api.get('/edital/');
-      setEditais(res.data);
+      setEditais(Array.isArray(res.data?.items) ? res.data.items : []);
     } catch (err) {
       console.error('Erro ao carregar editais', err);
     }
@@ -32,7 +32,7 @@ export const EditaisPage: React.FC = () => {
       try {
         const res = await api.get('/edital/');
         if (active) {
-          setEditais(res.data);
+          setEditais(Array.isArray(res.data?.items) ? res.data.items : []);
         }
       } catch (err) {
         console.error('Erro ao carregar editais', err);

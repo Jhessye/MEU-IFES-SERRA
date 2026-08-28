@@ -33,11 +33,7 @@ export const NoticiasPage: React.FC = () => {
 
       const res = await api.get('/noticia/');
       
-      if (Array.isArray(res.data)) {
-        setNoticias(res.data);
-      } else {
-        setNoticias([]);
-      }
+      setNoticias(Array.isArray(res.data?.items) ? res.data.items : []);
     } catch (err: unknown) {
       console.error('Erro ao carregar notícias:', err);
 
@@ -78,11 +74,7 @@ export const NoticiasPage: React.FC = () => {
         const res = await api.get('/noticia/');
         
         if (active) {
-          if (Array.isArray(res.data)) {
-            setNoticias(res.data);
-          } else {
-            setNoticias([]);
-          }
+          setNoticias(Array.isArray(res.data?.items) ? res.data.items : []);
           setError('');
         }
       } catch (err: unknown) {

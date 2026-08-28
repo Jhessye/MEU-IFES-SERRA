@@ -24,11 +24,7 @@ export const OportunidadesPage: React.FC = () => {
       setLoading(true);
       setError('');
       const res = await api.get('/oportunidade/');
-      if (Array.isArray(res.data)) {
-        setOportunidades(res.data);
-      } else {
-        setOportunidades([]);
-      }
+      setOportunidades(Array.isArray(res.data?.items) ? res.data.items : []);
     } catch (err) {
       console.error('Erro ao carregar oportunidades:', err);
       setError('Falha ao carregar oportunidades.');
@@ -46,11 +42,8 @@ export const OportunidadesPage: React.FC = () => {
         setError('');
         const res = await api.get('/oportunidade/');
         if (active) {
-          if (Array.isArray(res.data)) {
-            setOportunidades(res.data);
-          } else {
-            setOportunidades([]);
-          }
+          setOportunidades(Array.isArray(res.data?.items) ? res.data.items : []);
+          setError('');
         }
       } catch (err) {
         if (active) {
@@ -89,8 +82,7 @@ export const OportunidadesPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  // Ajustado de React.SubmitEvent para React.FormEvent
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     try {
       if (selected?.id) {
