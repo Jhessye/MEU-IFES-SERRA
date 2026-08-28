@@ -1,4 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -29,6 +33,7 @@ type Oportunidade = {
 
 export default function OportunidadesScreen() {
   const navigation = useNavigation();
+
   const [oportunidades, setOportunidades] =
     useState<Oportunidade[]>([]);
 
@@ -45,29 +50,81 @@ export default function OportunidadesScreen() {
   const [userId, setUserId] = useState<string | null>(null);
   const [salvos, setSalvos] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    buscarOportunidades();
-    AsyncStorage.getItem('user_id').then((id) => {
-      setUserId(id);
-      if (id) carregarSalvos(id);
-    });
-  }, []);
+  // ==================================================
+  // DATA
+  // ==================================================
 
-  // Recarrega a lista e os salvos quando a tela volta a receber foco.
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      setSearch('');
-      buscarOportunidades();
-      if (userId) carregarSalvos(userId);
-    });
-    return unsubscribe;
-  }, [navigation, userId]);
+  const dataFinalJaPassou = useCallback(
+    (dataFinal: string) => {
+      if (!dataFinal) return false;
+
+      let ano: number;
+      let mes: number;
+      let dia: number;
+
+      // Formato DD/MM/YYYY
+      const dataBr = dataFinal.match(
+        /^(\d{2})\/(\d{2})\/(\d{4})$/
+      );
+
+      if (dataBr) {
+        dia = Number(dataBr[1]);
+        mes = Number(dataBr[2]);
+        ano = Number(dataBr[3]);
+      } else {
+        // Formato ISO: YYYY-MM-DD ou YYYY-MM-DDTHH:mm:ss
+        const dataIso = dataFinal.match(
+          /^(\d{4})-(\d{2})-(\d{2})/
+        );
+
+        if (!dataIso) {
+          // Se não conseguir entender a data,
+          // mantém a oportunidade visível.
+          return false;
+        }
+
+        ano = Number(dataIso[1]);
+        mes = Number(dataIso[2]);
+        dia = Number(dataIso[3]);
+      }
+
+      // Data de hoje no horário local
+      const hoje = new Date();
+
+      const hojeSemHorario = new Date(
+        hoje.getFullYear(),
+        hoje.getMonth(),
+        hoje.getDate()
+      );
+
+      const dataFinalSemHorario = new Date(
+        ano,
+        mes - 1,
+        dia
+      );
+
+      return dataFinalSemHorario < hojeSemHorario;
+    },
+    []
+  );
+
+  const filtrarOportunidadesAtivas = useCallback(
+    (lista: Oportunidade[]) => {
+      return lista.filter(
+        (oportunidade) =>
+          !dataFinalJaPassou(
+            oportunidade.dataFinalInscricao
+          )
+      );
+    },
+    [dataFinalJaPassou]
+  );
 
   // ==================================================
   // BUSCAR OPORTUNIDADES
   // ==================================================
 
-  const buscarOportunidades = async () => {
+  const buscarOportunidades = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -81,7 +138,7 @@ export default function OportunidadesScreen() {
 
       setOportunidades(
         Array.isArray(dados)
-          ? dados
+          ? filtrarOportunidadesAtivas(dados)
           : []
       );
     } catch (error) {
@@ -92,7 +149,81 @@ export default function OportunidadesScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filtrarOportunidadesAtivas]);
+
+  // ==================================================
+  // SALVOS
+  // ==================================================
+
+  const carregarSalvos = useCallback(
+    async (id: string) => {
+      try {
+        const { data } =
+          await api.get(`/usuario/${id}`);
+
+        const ids = (
+          data.oportunidades_salvas || []
+        ).map((o: any) => o.id);
+
+        setSalvos(new Set(ids));
+      } catch (error) {
+        console.error(
+          'Erro ao carregar oportunidades salvas:',
+          error
+        );
+      }
+    },
+    []
+  );
+
+  // ==================================================
+  // INICIALIZAÇÃO
+  // ==================================================
+
+  useEffect(() => {
+    buscarOportunidades();
+
+    AsyncStorage.getItem('user_id').then((id) => {
+      setUserId(id);
+
+      if (id) {
+        carregarSalvos(id);
+      }
+    });
+  }, [buscarOportunidades, carregarSalvos]);
+
+  // Recarrega a lista e os salvos quando a tela volta a receber foco.
+  useEffect(() => {
+    const unsubscribe = navigation.addListener(
+      'focus',
+      () => {
+        setSearch('');
+        buscarOportunidades();
+
+        if (userId) {
+          carregarSalvos(userId);
+        }
+      }
+    );
+
+    return unsubscribe;
+  }, [
+    navigation,
+    userId,
+    buscarOportunidades,
+    carregarSalvos,
+  ]);
+
+  // Verifica periodicamente se alguma oportunidade venceu.
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setOportunidades((prev) =>
+        filtrarOportunidadesAtivas(prev)
+      );
+    }, 60 * 1000);
+
+    return () => clearInterval(intervalo);
+  }, [filtrarOportunidadesAtivas]);
 
   // ==================================================
   // PESQUISAR
@@ -123,7 +254,7 @@ export default function OportunidadesScreen() {
 
       setOportunidades(
         Array.isArray(resultados)
-          ? resultados
+          ? filtrarOportunidadesAtivas(resultados)
           : []
       );
     } catch (error) {
@@ -137,48 +268,53 @@ export default function OportunidadesScreen() {
   };
 
   // ==================================================
-  // SALVOS
+  // SALVAR / DESSALVAR
   // ==================================================
 
-  const carregarSalvos = async (id: string) => {
-    try {
-      const { data } = await api.get(`/usuario/${id}`);
-      const ids = (data.oportunidades_salvas || []).map((o: any) => o.id);
-      setSalvos(new Set(ids));
-    } catch (error) {
-      console.error('Erro ao carregar oportunidades salvas:', error);
-    }
-  };
-
-  const alternarSalvo = async (oportunidadeId: string) => {
+  const alternarSalvo = async (
+    oportunidadeId: string
+  ) => {
     if (!userId) return;
+
     const jaSalvo = salvos.has(oportunidadeId);
 
     setSalvos((prev) => {
       const novo = new Set(prev);
+
       if (jaSalvo) {
         novo.delete(oportunidadeId);
       } else {
         novo.add(oportunidadeId);
       }
+
       return novo;
     });
 
     try {
       if (jaSalvo) {
-        await api.delete(`/usuario/${userId}/dessalvar_oportunidade/${oportunidadeId}`);
+        await api.delete(
+          `/usuario/${userId}/dessalvar_oportunidade/${oportunidadeId}`
+        );
       } else {
-        await api.post(`/usuario/${userId}/salvar_oportunidade/${oportunidadeId}`);
+        await api.post(
+          `/usuario/${userId}/salvar_oportunidade/${oportunidadeId}`
+        );
       }
     } catch (error) {
-      console.error('Erro ao salvar oportunidade:', error);
+      console.error(
+        'Erro ao salvar oportunidade:',
+        error
+      );
+
       setSalvos((prev) => {
         const novo = new Set(prev);
+
         if (jaSalvo) {
           novo.add(oportunidadeId);
         } else {
           novo.delete(oportunidadeId);
         }
+
         return novo;
       });
     }
@@ -270,7 +406,9 @@ export default function OportunidadesScreen() {
             }}
             abrirVaga={abrirVaga}
             salvo={salvos.has(item.id)}
-            onToggleSalvo={() => alternarSalvo(item.id)}
+            onToggleSalvo={() =>
+              alternarSalvo(item.id)
+            }
           />
         )}
         ItemSeparatorComponent={() => (
@@ -324,11 +462,22 @@ function OportunidadeCard({
         onPress={onPress}
       >
 
-        <TouchableOpacity onPress={onToggleSalvo} hitSlop={8}>
+        <TouchableOpacity
+          onPress={onToggleSalvo}
+          hitSlop={8}
+        >
           <Ionicons
-            name={salvo ? 'bookmark' : 'bookmark-outline'}
+            name={
+              salvo
+                ? 'bookmark'
+                : 'bookmark-outline'
+            }
             size={22}
-            color={salvo ? colors.red : '#222'}
+            color={
+              salvo
+                ? colors.red
+                : '#222'
+            }
             style={styles.bookmark}
           />
         </TouchableOpacity>
@@ -343,7 +492,9 @@ function OportunidadeCard({
 
           <Text style={styles.expiration}>
             inscrição por {oportunidade.diasInscricao}{' '}
-            {oportunidade.diasInscricao === 1 ? 'dia' : 'dias'}
+            {oportunidade.diasInscricao === 1
+              ? 'dia'
+              : 'dias'}
           </Text>
         </View>
 
