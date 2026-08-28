@@ -100,7 +100,7 @@ export default function TabsLayout() {
   const falarConosco = async () => {
     fecharMenu();
 
-    const email = 'desenvolvedores@ifes.edu.br';
+    const email = 'cex.ser@ifes.edu.br';
 
     try {
       await Linking.openURL(`mailto:${email}`);
