@@ -1,11 +1,10 @@
 import React from 'react';
+import { Link, useNavigate, Outlet } from 'react-router-dom';
 import { colors } from '../config/theme';
 
-const navigate = (path: string) => {
-  window.location.href = path;
-};
-
 export const Layout: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -22,18 +21,18 @@ export const Layout: React.FC = () => {
           Meu Ifes Serra
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <a href="/admin/noticias" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+          <Link to="/admin/noticias" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             📰 Notícias
-          </a>
-          <a href="/admin/editais" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+          </Link>
+          <Link to="/admin/editais" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             📜 Editais
-          </a>
-          <a href="/admin/oportunidades" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+          </Link>
+          <Link to="/admin/oportunidades" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             💼 Oportunidades
-          </a>
-          <a href="/admin/usuarios-admin" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+          </Link>
+          <Link to="/admin/usuarios-admin" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             👤 Administradores
-          </a>
+          </Link>
         </nav>
         <div className="p-4 border-t" style={{ borderColor: colors.border }}>
           <button
@@ -48,6 +47,7 @@ export const Layout: React.FC = () => {
 
       {/* Conteúdo Principal */}
       <main className="flex-1 p-8 overflow-y-auto">
+        <Outlet />
       </main>
     </div>
   );
