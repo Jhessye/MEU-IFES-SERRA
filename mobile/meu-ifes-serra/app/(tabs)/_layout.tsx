@@ -543,16 +543,14 @@ const styles = StyleSheet.create({
 
   headerTitle: {
     flex: 1,
-
     textAlign: 'center',
-
     fontSize: 33,
-
     marginTop: 2,
-
     fontWeight: '600',
-
     color: colors.white,
+    textShadowColor: 'rgba(0, 0, 0, 0.25)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
 
   headerRight: {
