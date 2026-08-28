@@ -7,6 +7,8 @@ export const NoticiasPage: React.FC = () => {
   const [noticias, setNoticias] = useState<Noticia[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<Noticia | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [form, setForm] = useState<Noticia>({
     titulo: '',
@@ -19,24 +21,91 @@ export const NoticiasPage: React.FC = () => {
 
   const carregarNoticias = useCallback(async () => {
     try {
+      setLoading(true);
+      setError('');
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token de autenticação não encontrado. Faça login novamente.');
+        setLoading(false);
+        return;
+      }
+
       const res = await api.get('/noticia/');
-      setNoticias(res.data);
-    } catch (err) {
-      console.error('Erro ao carregar notícias', err);
+      
+      if (Array.isArray(res.data)) {
+        setNoticias(res.data);
+      } else {
+        setNoticias([]);
+      }
+    } catch (err: unknown) {
+      console.error('Erro ao carregar notícias:', err);
+
+      const status =
+        typeof err === 'object' && err !== null && 'response' in err &&
+        typeof err.response === 'object' && err.response !== null &&
+        'status' in err.response
+          ? (err.response as { status: number }).status
+          : undefined;
+
+      if (status === 401) {
+        setError('Sessão expirada. Faça login novamente.');
+      } else if (status === 404) {
+        setError('Endpoint de notícias não encontrado. Verifique a URL da API.');
+      } else {
+        setError('Erro ao carregar notícias. Tente novamente.');
+      }
+    } finally {
+      setLoading(false);
     }
   }, []);
 
+  // Efeito isolado sem chamadas de setState síncronas diretamente na raiz do Effect
   useEffect(() => {
     let active = true;
 
     const fetchData = async () => {
       try {
-        const res = await api.get('/noticia/');
-        if (active) {
-          setNoticias(res.data);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          if (active) {
+            setError('Token de autenticação não encontrado. Faça login novamente.');
+            setLoading(false);
+          }
+          return;
         }
-      } catch (err) {
-        console.error('Erro ao carregar notícias', err);
+
+        const res = await api.get('/noticia/');
+        
+        if (active) {
+          if (Array.isArray(res.data)) {
+            setNoticias(res.data);
+          } else {
+            setNoticias([]);
+          }
+          setError('');
+        }
+      } catch (err: unknown) {
+        if (!active) return;
+
+        const status =
+          typeof err === 'object' && err !== null && 'response' in err &&
+          typeof err.response === 'object' && err.response !== null &&
+          'status' in err.response
+            ? (err.response as { status: number }).status
+            : undefined;
+
+        if (status === 401) {
+          setError('Sessão expirada. Faça login novamente.');
+        } else if (status === 404) {
+          setError('Endpoint de notícias não encontrado. Verifique a URL da API.');
+        } else {
+          setError('Erro ao carregar notícias. Tente novamente.');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
@@ -68,7 +137,7 @@ export const NoticiasPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = async (e: React.SubmitEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (selected?.id) {
@@ -107,54 +176,76 @@ export const NoticiasPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden border" style={{ borderColor: colors.border }}>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b bg-gray-50" style={{ borderColor: colors.border }}>
-              <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Título</th>
-              <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Autor</th>
-              <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Data</th>
-              <th className="p-4 text-sm font-semibold text-right" style={{ color: colors.textDark }}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {noticias.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-6 text-center text-sm" style={{ color: colors.textGray }}>
-                  Nenhuma notícia cadastrada.
-                </td>
+      {loading && (
+        <div className="text-center py-8">
+          <div 
+            className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent" 
+            style={{ borderColor: colors.greenDark, borderTopColor: 'transparent' }} 
+          />
+          <p className="mt-2 text-sm" style={{ color: colors.textGray }}>Carregando notícias...</p>
+        </div>
+      )}
+
+      {error && (
+        <div 
+          className="mb-4 p-3 rounded text-sm text-white font-medium text-center" 
+          style={{ backgroundColor: colors.red }}
+        >
+          {error}
+        </div>
+      )}
+
+      {!loading && (
+        <div className="bg-white rounded-lg shadow overflow-hidden border" style={{ borderColor: colors.border }}>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b bg-gray-50" style={{ borderColor: colors.border }}>
+                <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Título</th>
+                <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Autor</th>
+                <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Data</th>
+                <th className="p-4 text-sm font-semibold text-right" style={{ color: colors.textDark }}>Ações</th>
               </tr>
-            ) : (
-              noticias.map((item) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50" style={{ borderColor: colors.border }}>
-                  <td className="p-4 text-sm" style={{ color: colors.textDark }}>{item.titulo}</td>
-                  <td className="p-4 text-sm" style={{ color: colors.textGray }}>{item.autor}</td>
-                  <td className="p-4 text-sm" style={{ color: colors.textGray }}>
-                    {item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '-'}
-                  </td>
-                  <td className="p-4 text-sm text-right space-x-2">
-                    <button
-                      onClick={() => handleOpenModal(item)}
-                      className="px-3 py-1 border rounded text-xs font-medium hover:bg-gray-100"
-                      style={{ borderColor: colors.border, color: colors.textDark }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id!)}
-                      className="px-3 py-1 border rounded text-xs font-medium hover:bg-red-50"
-                      style={{ borderColor: colors.red, color: colors.red }}
-                    >
-                      Excluir
-                    </button>
+            </thead>
+            <tbody>
+              {noticias.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-sm" style={{ color: colors.textGray }}>
+                    Nenhuma notícia cadastrada.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                noticias.map((item) => (
+                  <tr key={item.id} className="border-b hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                    <td className="p-4 text-sm" style={{ color: colors.textDark }}>{item.titulo}</td>
+                    <td className="p-4 text-sm" style={{ color: colors.textGray }}>{item.autor}</td>
+                    <td className="p-4 text-sm" style={{ color: colors.textGray }}>
+                      {item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '-'}
+                    </td>
+                    <td className="p-4 text-sm text-right space-x-2">
+                      <button
+                        onClick={() => handleOpenModal(item)}
+                        className="px-3 py-1 border rounded text-xs font-medium hover:bg-gray-100"
+                        style={{ borderColor: colors.border, color: colors.textDark }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id!)}
+                        className="px-3 py-1 border rounded text-xs font-medium hover:bg-red-50"
+                        style={{ borderColor: colors.red, color: colors.red }}
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
+      {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-xl w-full p-6 space-y-4 shadow-xl">
