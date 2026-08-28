@@ -7,6 +7,8 @@ export const OportunidadesPage: React.FC = () => {
   const [oportunidades, setOportunidades] = useState<Oportunidade[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<Oportunidade | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [form, setForm] = useState<Oportunidade>({
     titulo: '',
@@ -17,28 +19,48 @@ export const OportunidadesPage: React.FC = () => {
     dataFinalInscricao: ''
   });
 
-  // useCallback evita re-criação desnecessária da função em cada render
   const carregarOportunidades = useCallback(async () => {
     try {
+      setLoading(true);
+      setError('');
       const res = await api.get('/oportunidade/');
-      setOportunidades(res.data);
+      if (Array.isArray(res.data)) {
+        setOportunidades(res.data);
+      } else {
+        setOportunidades([]);
+      }
     } catch (err) {
       console.error('Erro ao carregar oportunidades:', err);
+      setError('Falha ao carregar oportunidades.');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  // Chamada assíncrona isolada dentro do useEffect
   useEffect(() => {
     let active = true;
 
     const fetchData = async () => {
       try {
+        setLoading(true);
+        setError('');
         const res = await api.get('/oportunidade/');
         if (active) {
-          setOportunidades(res.data);
+          if (Array.isArray(res.data)) {
+            setOportunidades(res.data);
+          } else {
+            setOportunidades([]);
+          }
         }
       } catch (err) {
-        console.error('Erro ao carregar oportunidades:', err);
+        if (active) {
+          console.error('Erro ao carregar oportunidades:', err);
+          setError('Falha ao carregar oportunidades.');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
@@ -67,7 +89,8 @@ export const OportunidadesPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = async (e: React.SubmitEvent) => {
+  // Ajustado de React.SubmitEvent para React.FormEvent
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (selected?.id) {
@@ -96,7 +119,9 @@ export const OportunidadesPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: colors.textDark }}>Gerenciar Oportunidades</h1>
+        <h1 className="text-2xl font-bold" style={{ color: colors.textDark }}>
+          Gerenciar Oportunidades
+        </h1>
         <button
           onClick={() => handleOpenModal()}
           className="px-4 py-2 text-white font-medium rounded-md shadow-sm hover:opacity-90 transition-opacity"
@@ -106,54 +131,73 @@ export const OportunidadesPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Tabela de Listagem */}
-      <div className="bg-white rounded-lg shadow overflow-hidden border" style={{ borderColor: colors.border }}>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b bg-gray-50" style={{ borderColor: colors.border }}>
-              <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Título</th>
-              <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Carga Horária</th>
-              <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Data Limite</th>
-              <th className="p-4 text-sm font-semibold text-right" style={{ color: colors.textDark }}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {oportunidades.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-6 text-center text-sm" style={{ color: colors.textGray }}>
-                  Nenhuma oportunidade cadastrada.
-                </td>
+      {loading && (
+        <div className="text-center py-8">
+          <div 
+            className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent" 
+            style={{ borderColor: colors.greenDark, borderTopColor: 'transparent' }} 
+          />
+          <p className="mt-2 text-sm" style={{ color: colors.textGray }}>Carregando dados...</p>
+        </div>
+      )}
+
+      {error && (
+        <div 
+          className="mb-4 p-3 rounded text-sm text-white font-medium text-center" 
+          style={{ backgroundColor: colors.red }}
+        >
+          {error}
+        </div>
+      )}
+
+      {!loading && (
+        <div className="bg-white rounded-lg shadow overflow-hidden border" style={{ borderColor: colors.border }}>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b bg-gray-50" style={{ borderColor: colors.border }}>
+                <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Título</th>
+                <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Carga Horária</th>
+                <th className="p-4 text-sm font-semibold" style={{ color: colors.textDark }}>Data Limite</th>
+                <th className="p-4 text-sm font-semibold text-right" style={{ color: colors.textDark }}>Ações</th>
               </tr>
-            ) : (
-              oportunidades.map((op) => (
-                <tr key={op.id} className="border-b hover:bg-gray-50" style={{ borderColor: colors.border }}>
-                  <td className="p-4 text-sm" style={{ color: colors.textDark }}>{op.titulo}</td>
-                  <td className="p-4 text-sm" style={{ color: colors.textGray }}>{op.cargaHoraria || 'N/A'}</td>
-                  <td className="p-4 text-sm" style={{ color: colors.textGray }}>{op.dataFinalInscricao}</td>
-                  <td className="p-4 text-sm text-right space-x-2">
-                    <button
-                      onClick={() => handleOpenModal(op)}
-                      className="px-3 py-1 border rounded text-xs font-medium hover:bg-gray-100"
-                      style={{ borderColor: colors.border, color: colors.textDark }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(op.id!)}
-                      className="px-3 py-1 border rounded text-xs font-medium hover:bg-red-50"
-                      style={{ borderColor: colors.red, color: colors.red }}
-                    >
-                      Excluir
-                    </button>
+            </thead>
+            <tbody>
+              {Array.isArray(oportunidades) && oportunidades.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-sm" style={{ color: colors.textGray }}>
+                    Nenhuma oportunidade cadastrada.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                Array.isArray(oportunidades) && oportunidades.map((op) => (
+                  <tr key={op.id} className="border-b hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                    <td className="p-4 text-sm" style={{ color: colors.textDark }}>{op.titulo}</td>
+                    <td className="p-4 text-sm" style={{ color: colors.textGray }}>{op.cargaHoraria || 'N/A'}</td>
+                    <td className="p-4 text-sm" style={{ color: colors.textGray }}>{op.dataFinalInscricao}</td>
+                    <td className="p-4 text-sm text-right space-x-2">
+                      <button
+                        onClick={() => handleOpenModal(op)}
+                        className="px-3 py-1 border rounded text-xs font-medium hover:bg-gray-100"
+                        style={{ borderColor: colors.border, color: colors.textDark }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(op.id!)}
+                        className="px-3 py-1 border rounded text-xs font-medium hover:bg-red-50"
+                        style={{ borderColor: colors.red, color: colors.red }}
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Modal de Criação e Edição */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-lg w-full p-6 space-y-4 shadow-xl">
