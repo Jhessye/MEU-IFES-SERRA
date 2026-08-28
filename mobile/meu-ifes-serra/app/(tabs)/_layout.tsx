@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
 
     textAlign: 'center',
 
-    fontSize: 26,
+    fontSize: 33,
 
     marginTop: 2,
 
