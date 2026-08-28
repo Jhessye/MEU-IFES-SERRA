@@ -23,16 +23,19 @@ export const Layout: React.FC = () => {
         <nav className="flex-1 p-4 space-y-2">
           <Link to="/admin/noticias" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             📰 Notícias
-          </Link>
-          <Link to="/admin/editais" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+            </Link>
+            <Link to="/admin/editais" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             📜 Editais
-          </Link>
-          <Link to="/admin/oportunidades" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+            </Link>
+            <Link to="/admin/oportunidades" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             💼 Oportunidades
-          </Link>
-          <Link to="/admin/usuarios-admin" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+            </Link>
+            <Link to="/admin/usuarios" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
+            📱 Usuários App
+            </Link>
+            <Link to="/admin/admins" className="block p-2.5 rounded hover:bg-gray-100 font-medium" style={{ color: colors.textDark }}>
             👤 Administradores
-          </Link>
+            </Link>
         </nav>
         <div className="p-4 border-t" style={{ borderColor: colors.border }}>
           <button
