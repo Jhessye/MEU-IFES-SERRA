@@ -26,6 +26,7 @@ type Edital = {
 
 export default function EditaisScreen() {
   const navigation = useNavigation();
+
   const [editais, setEditais] = useState<Edital[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,11 +36,19 @@ export default function EditaisScreen() {
   const [userId, setUserId] = useState<string | null>(null);
   const [salvos, setSalvos] = useState<Set<string>>(new Set());
 
+  // ==================================================
+  // INICIALIZAÇÃO
+  // ==================================================
+
   useEffect(() => {
     buscarEditais();
+
     AsyncStorage.getItem('user_id').then((id) => {
       setUserId(id);
-      if (id) carregarSalvos(id);
+
+      if (id) {
+        carregarSalvos(id);
+      }
     });
   }, []);
 
@@ -48,8 +57,12 @@ export default function EditaisScreen() {
     const unsubscribe = navigation.addListener('focus', () => {
       setSearch('');
       buscarEditais();
-      if (userId) carregarSalvos(userId);
+
+      if (userId) {
+        carregarSalvos(userId);
+      }
     });
+
     return unsubscribe;
   }, [navigation, userId]);
 
@@ -68,9 +81,14 @@ export default function EditaisScreen() {
         response.data?.resultados ||
         response.data;
 
-      setEditais(Array.isArray(dados) ? dados : []);
+      setEditais(
+        Array.isArray(dados) ? dados : []
+      );
     } catch (error) {
-      console.error('Erro ao buscar editais:', error);
+      console.error(
+        'Erro ao buscar editais:',
+        error
+      );
     } finally {
       setIsLoading(false);
     }
@@ -91,13 +109,17 @@ export default function EditaisScreen() {
     try {
       setIsSearching(true);
 
-      const response = await api.get('/search/editais', {
-        params: {
-          q: termo,
-        },
-      });
+      const response = await api.get(
+        '/search/editais',
+        {
+          params: {
+            q: termo,
+          },
+        }
+      );
 
-      const resultados = response.data?.resultados || [];
+      const resultados =
+        response.data?.resultados || [];
 
       setEditais(
         Array.isArray(resultados)
@@ -105,7 +127,10 @@ export default function EditaisScreen() {
           : []
       );
     } catch (error) {
-      console.error('Erro ao pesquisar editais:', error);
+      console.error(
+        'Erro ao pesquisar editais:',
+        error
+      );
     } finally {
       setIsSearching(false);
     }
@@ -117,59 +142,92 @@ export default function EditaisScreen() {
 
   const carregarSalvos = async (id: string) => {
     try {
-      const { data } = await api.get(`/usuario/${id}`);
-      const ids = (data.editais_salvos || []).map((e: any) => e.id);
+      const { data } =
+        await api.get(`/usuario/${id}`);
+
+      const ids = (
+        data.editais_salvos || []
+      ).map((e: any) => e.id);
+
       setSalvos(new Set(ids));
     } catch (error) {
-      console.error('Erro ao carregar editais salvos:', error);
+      console.error(
+        'Erro ao carregar editais salvos:',
+        error
+      );
     }
   };
 
-  const alternarSalvo = async (editalId: string) => {
+  // ==================================================
+  // SALVAR / DESSALVAR
+  // ==================================================
+
+  const alternarSalvo = async (
+    editalId: string
+  ) => {
     if (!userId) return;
+
     const jaSalvo = salvos.has(editalId);
 
     setSalvos((prev) => {
       const novo = new Set(prev);
+
       if (jaSalvo) {
         novo.delete(editalId);
       } else {
         novo.add(editalId);
       }
+
       return novo;
     });
 
     try {
       if (jaSalvo) {
-        await api.delete(`/usuario/${userId}/dessalvar_edital/${editalId}`);
+        await api.delete(
+          `/usuario/${userId}/dessalvar_edital/${editalId}`
+        );
       } else {
-        await api.post(`/usuario/${userId}/salvar_edital/${editalId}`);
+        await api.post(
+          `/usuario/${userId}/salvar_edital/${editalId}`
+        );
       }
     } catch (error) {
-      console.error('Erro ao salvar edital:', error);
+      console.error(
+        'Erro ao salvar edital:',
+        error
+      );
+
+      // Volta o estado caso a requisição dê erro
       setSalvos((prev) => {
         const novo = new Set(prev);
+
         if (jaSalvo) {
           novo.add(editalId);
         } else {
           novo.delete(editalId);
         }
+
         return novo;
       });
     }
   };
 
   // ==================================================
-  // ABRIR LINK
+  // ABRIR LINK NO NAVEGADOR
   // ==================================================
 
-  const abrirLink = async (url?: string | null) => {
+  const abrirLink = async (
+    url?: string | null
+  ) => {
     if (!url) return;
 
     try {
       await Linking.openURL(url);
     } catch (error) {
-      console.error('Erro ao abrir link:', error);
+      console.error(
+        'Erro ao abrir link:',
+        error
+      );
     }
   };
 
@@ -205,7 +263,7 @@ export default function EditaisScreen() {
         <TextInput
           value={search}
           onChangeText={pesquisar}
-          placeholder="Valor"
+          placeholder="Pesquisar"
           placeholderTextColor="#BDBDBD"
           style={styles.searchInput}
         />
@@ -236,7 +294,9 @@ export default function EditaisScreen() {
             edital={item}
             abrirLink={abrirLink}
             salvo={salvos.has(item.id)}
-            onToggleSalvo={() => alternarSalvo(item.id)}
+            onToggleSalvo={() =>
+              alternarSalvo(item.id)
+            }
           />
         )}
         ItemSeparatorComponent={() => (
@@ -261,7 +321,7 @@ export default function EditaisScreen() {
 }
 
 // ======================================================
-// CARD
+// CARD DO EDITAL
 // ======================================================
 
 function EditalCard({
@@ -278,7 +338,7 @@ function EditalCard({
   return (
     <View style={styles.card}>
 
-      {/* ÍCONE */}
+      {/* BOOKMARK */}
 
       <TouchableOpacity
         style={styles.bookmarkButton}
@@ -286,9 +346,17 @@ function EditalCard({
         onPress={onToggleSalvo}
       >
         <Ionicons
-          name={salvo ? 'bookmark' : 'bookmark-outline'}
+          name={
+            salvo
+              ? 'bookmark'
+              : 'bookmark-outline'
+          }
           size={23}
-          color={salvo ? colors.red : '#202020'}
+          color={
+            salvo
+              ? colors.red
+              : '#202020'
+          }
         />
       </TouchableOpacity>
 
@@ -296,12 +364,23 @@ function EditalCard({
 
       <View style={styles.cardContent}>
 
-        <Text
-          style={styles.title}
-          numberOfLines={2}
+        {/* TÍTULO / LINK DO EDITAL */}
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() =>
+            abrirLink(edital.link)
+          }
         >
-          {edital.titulo}
-        </Text>
+          <Text
+            style={styles.title}
+            numberOfLines={2}
+          >
+            {edital.titulo}
+          </Text>
+        </TouchableOpacity>
+
+        {/* DESCRIÇÃO */}
 
         <Text
           style={styles.description}
@@ -310,25 +389,27 @@ function EditalCard({
           {edital.texto}
         </Text>
 
-        {/* EDITAL / PDF */}
+        {/* PDF DO EDITAL */}
 
-        <TouchableOpacity
-          style={styles.linkRow}
-          activeOpacity={0.7}
-          onPress={() =>
-            abrirLink(edital.pdf || edital.link)
-          }
-        >
-          <Ionicons
-            name="document-outline"
-            size={22}
-            color={colors.greenAccent}
-          />
+        {edital.pdf && (
+          <TouchableOpacity
+            style={styles.linkRow}
+            activeOpacity={0.7}
+            onPress={() =>
+              abrirLink(edital.pdf)
+            }
+          >
+            <Ionicons
+              name="document-outline"
+              size={22}
+              color={colors.greenAccent}
+            />
 
-          <Text style={styles.linkText}>
-            Abrir edital
-          </Text>
-        </TouchableOpacity>
+            <Text style={styles.linkText}>
+              Abrir PDF do edital
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {/* FORMULÁRIO */}
 
@@ -379,7 +460,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     marginBottom: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
     shadowOpacity: 0.04,
     shadowRadius: 3,
     elevation: 1,
