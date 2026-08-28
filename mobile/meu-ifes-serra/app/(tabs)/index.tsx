@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
   FlatList,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -84,6 +85,15 @@ export default function HomeScreen() {
     }
   };
 
+  const abrirLink = async (url?: string | null) => {
+  if (!url) return;
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error('Erro ao abrir link:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -120,19 +130,39 @@ export default function HomeScreen() {
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
           renderItem={({ item }) => (
-            <TouchableOpacity activeOpacity={0.8} style={styles.card}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.card}
+              onPress={() => abrirLink(item.link)}
+            >
               <Image
                 source={{
-                  uri: item.imagem || 'https://via.placeholder.com/100x80/EEEEEE/CCCCCC?text=',
+                  uri:
+                    item.imagem ||
+                    'https://via.placeholder.com/100x80/EEEEEE/CCCCCC?text=',
                 }}
                 style={styles.noticiaImage}
               />
+
               <View style={styles.textContainer}>
-                <Text style={styles.title} numberOfLines={1}>{item.titulo || 'Title'}</Text>
-                <Text style={styles.description} numberOfLines={2}>
-                  {item.texto || 'Body text for whatever you\u2019d like to say. Add main takeaway points.'}
+                <Text
+                  style={styles.title}
+                  numberOfLines={1}
+                >
+                  {item.titulo || 'Title'}
                 </Text>
-                <Text style={styles.date}>{formatarData(item.data)}</Text>
+
+                <Text
+                  style={styles.description}
+                  numberOfLines={2}
+                >
+                  {item.texto ||
+                    'Body text for whatever you’d like to say. Add main takeaway points.'}
+                </Text>
+
+                <Text style={styles.date}>
+                  {formatarData(item.data)}
+                </Text>
               </View>
             </TouchableOpacity>
           )}
