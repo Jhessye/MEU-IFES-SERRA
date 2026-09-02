@@ -8,14 +8,14 @@ from backend.service import admin_service
 admin_bp = APIBlueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.route('/', methods=['GET'])
-#@admin_required
+@admin_required
 def listar_admins():
     admins = admin_service.listar_admins()
     return jsonify(admins), 200
 
 
 @admin_bp.route('/', methods=['POST'])
-#@admin_required
+@admin_required
 def criar_admin():
     data = request.get_json()
     novo_admin = admin_service.criar_admin(data)
@@ -25,7 +25,7 @@ def criar_admin():
 
 
 @admin_bp.route('/<uuid:admin_id>', methods=['DELETE'])
-#@admin_required
+@admin_required
 def deletar_admin(admin_id):
 
     if admin_service.contar_admins() <= 1:
@@ -38,7 +38,7 @@ def deletar_admin(admin_id):
     return jsonify({"message": "Admin deletado com sucesso"}), 200
 
 @admin_bp.route('/<uuid:admin_id>/senha', methods=['PUT'])
-#@admin_required
+@admin_required
 def alterar_senha(admin_id):
     if str(admin_id) != get_jwt_identity():
         return jsonify({"error": "Você só pode alterar sua própria senha"}), 403

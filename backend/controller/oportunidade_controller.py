@@ -12,7 +12,7 @@ def listar_oportunidades():
     return jsonify(oportunidades), 200
 
 @oportunidade_bp.route('/', methods=['POST'])
-#@admin_required
+@admin_required
 @oportunidade_bp.input(OportunidadeInSchema)
 def criar_oportunidade(json_data):
     nova_oportunidade = oportunidade_service.criar_oportunidade(json_data)
@@ -21,7 +21,7 @@ def criar_oportunidade(json_data):
     return jsonify(nova_oportunidade), 201
 
 @oportunidade_bp.route('/<uuid:oportunidade_id>', methods=['PUT'])
-#@admin_required
+@admin_required
 @oportunidade_bp.input(OportunidadeInSchema)
 def atualizar_oportunidade(oportunidade_id, json_data):
     oportunidade_atualizada = oportunidade_service.atualizar_oportunidade(oportunidade_id, json_data)
@@ -30,7 +30,7 @@ def atualizar_oportunidade(oportunidade_id, json_data):
     return jsonify(oportunidade_atualizada), 200
 
 @oportunidade_bp.route('/<uuid:oportunidade_id>', methods=['DELETE'])
-#@admin_required
+@admin_required
 def deletar_oportunidade(oportunidade_id):
     oportunidade_deletada = oportunidade_service.deletar_oportunidade(oportunidade_id)
     if oportunidade_deletada is None:
