@@ -59,7 +59,7 @@ export const EditaisPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setSubmitError('');
     try {

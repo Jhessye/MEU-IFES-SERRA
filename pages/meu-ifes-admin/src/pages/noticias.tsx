@@ -130,14 +130,19 @@ export const NoticiasPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setSubmitError('');
     try {
+      const payload = {
+        ...form,
+        data: form.data ? `${form.data}T00:00:00` : form.data,
+      };
+
       if (selected?.id) {
-        await api.put(`/noticia/${selected.id}`, form);
+        await api.put(`/noticia/${selected.id}`, payload);
       } else {
-        await api.post('/noticia/', form);
+        await api.post('/noticia/', payload);
       }
       setModalOpen(false);
       carregarNoticias();
