@@ -16,12 +16,14 @@ import { useNavigation } from 'expo-router';
 import { colors } from '@/theme/colors';
 import api from '@/app/services/api';
 
+const noticiaPlaceholder = require('../../assets/images/android-icon-foreground.png');
+
 type Noticia = {
   id: string;
   titulo: string;
   autor: string;
   data: string;
-  imagem?: string;
+  imagem?: string | null;
   texto: string;
   link: string;
 };
@@ -136,11 +138,7 @@ export default function HomeScreen() {
               onPress={() => abrirLink(item.link)}
             >
               <Image
-                source={{
-                  uri:
-                    item.imagem ||
-                    'https://via.placeholder.com/100x80/EEEEEE/CCCCCC?text=',
-                }}
+                source={item.imagem ? { uri: item.imagem } : noticiaPlaceholder}
                 style={styles.noticiaImage}
               />
 
