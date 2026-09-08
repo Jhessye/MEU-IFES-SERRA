@@ -27,11 +27,11 @@ def criar_oportunidade(data):
         observacoes = data.get("observacoes")
         data_fim = data.get("dataFinalInscricao")
 
-        if not titulo or not carga_horaria or not requisitos or not data_fim:
+        if not titulo or not link_vaga or not data_fim:
             return None #dados incompletos
 
         if calcular_dias_inscricao(data_fim) < 0:
-            return None #dados incompletos
+            return None #data ja vencida
 
         nova_oportunidade = Oportunidade(
             titulo=titulo,
@@ -61,11 +61,11 @@ def atualizar_oportunidade(oportunidade_id, data):
         observacoes = data.get("observacoes")
         data_fim = data.get("dataFinalInscricao")
 
-        if not titulo or not carga_horaria or not requisitos or not data_fim:
+        if not titulo or not link_vaga or not data_fim:
             return None #dados incompletos
 
         if calcular_dias_inscricao(data_fim) < 0:
-            return None #dados incompletos
+            return None #data ja vencida
 
         oportunidade.titulo = titulo
         oportunidade.link_vaga = link_vaga
@@ -85,4 +85,30 @@ def deletar_oportunidade(oportunidade_id):
         return None #oportunidade nao existe
     db.session.delete(oportunidade)
     db.session.commit()
+    return True
+
+def salvar_oportunidade(usuario_id, oportunidade_id):
+    usuario = db.session.get(Usuario, usuario_id)   
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
+
+    if not usuario or not oportunidade:
+        return False
+
+    if oportunidade not in usuario.oportunidades_salvas:
+        usuario.oportunidades_salvas.append(oportunidade)
+        db.session.commit()
+
+    return True
+
+def dessalvar_oportunidade(usuario_id, oportunidade_id):
+    usuario = db.session.get(Usuario, usuario_id)
+    oportunidade = db.session.get(Oportunidade, oportunidade_id)
+
+    if not usuario or not oportunidade:
+        return False
+
+    if oportunidade in usuario.oportunidades_salvas:
+        usuario.oportunidades_salvas.remove(oportunidade)
+        db.session.commit()
+
     return True
