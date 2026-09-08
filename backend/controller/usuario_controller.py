@@ -23,7 +23,7 @@ def buscar_usuario(usuario_id):
 @usuario_bp.input(UsuarioInSchema)
 def criar_usuario(json_data):
         
-    novo_usuario = usuario_service.criar_usuario(json_data)
+    novo_usuario = usuario_service.criar_usuario(json_data, request.remote_addr)
     if novo_usuario is None:
         return jsonify({"error": "Dados incompletos"}), 400
     return jsonify(novo_usuario), 201

@@ -14,7 +14,7 @@ def listar_usuarios(page=1, per_page=20):
         "pages": paginacao.pages,
     }
 
-def criar_usuario(data):
+def criar_usuario(data, ip=None):
     try:
         usuario_id = data.get("id")  # pode vir None
         recebe_notificacao_noticia = data.get("recebeNotificacaoNoticia")
@@ -25,7 +25,8 @@ def criar_usuario(data):
             id=usuario_id,  # se None, o default do BaseModel assume
             recebeNotificacaoNoticia=recebe_notificacao_noticia,
             recebeNotificacaoEdital=recebe_notificacao_edital,
-            recebeNotificacaoOportunidade=recebe_notificacao_oportunidade
+            recebeNotificacaoOportunidade=recebe_notificacao_oportunidade,
+            ip=ip
         )
         db.session.add(novo_usuario)
         db.session.commit()

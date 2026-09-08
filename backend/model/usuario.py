@@ -19,6 +19,7 @@ class Usuario(BaseModel):
     recebeNotificacaoNoticia = db.Column(db.Boolean, default=False, nullable=False)
     recebeNotificacaoEdital = db.Column(db.Boolean, default=False, nullable=False)
     recebeNotificacaoOportunidade = db.Column(db.Boolean, default=False, nullable=False)
+    ip = db.Column(db.String(45), nullable=True)
     #token para envio de notificações push via Expo
     expo_push_token = db.Column(db.String(255), nullable=True)
 
@@ -32,6 +33,7 @@ class Usuario(BaseModel):
             "recebeNotificacaoNoticia": self.recebeNotificacaoNoticia,
             "recebeNotificacaoEdital": self.recebeNotificacaoEdital,
             "recebeNotificacaoOportunidade": self.recebeNotificacaoOportunidade,
+            "ip": self.ip,
             "editais_salvos": [edital.to_dict() for edital in self.editais_salvos],
             "oportunidades_salvas": [op.to_dict() for op in self.oportunidades_salvas]
         }
