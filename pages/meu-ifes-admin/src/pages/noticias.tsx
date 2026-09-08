@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '../services/api';
 import { type Noticia } from '../types';
 import { colors } from '../config/theme';
+import defaultImage from '../assets/android-icon-foreground.png';
 
 export const NoticiasPage: React.FC = () => {
   const [noticias, setNoticias] = useState<Noticia[]>([]);
@@ -222,6 +223,13 @@ export const NoticiasPage: React.FC = () => {
               ) : (
                 noticias.map((item) => (
                   <tr key={item.id} className="border-b hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                    <td className="p-4">
+                      <img
+                        src={item.imagem || defaultImage}
+                        alt=""
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                    </td>
                     <td className="p-4 text-sm" style={{ color: colors.textDark }}>{item.titulo}</td>
                     <td className="p-4 text-sm" style={{ color: colors.textGray }}>{item.autor}</td>
                     <td className="p-4 text-sm" style={{ color: colors.textGray }}>
