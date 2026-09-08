@@ -7,6 +7,7 @@ export const EditaisPage: React.FC = () => {
   const [editais, setEditais] = useState<Edital[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<Edital | null>(null);
+  const [submitError, setSubmitError] = useState('');
 
   const [form, setForm] = useState<Edital>({
     titulo: '',
@@ -47,6 +48,7 @@ export const EditaisPage: React.FC = () => {
   }, []);
 
   const handleOpenModal = (item?: Edital) => {
+    setSubmitError('');
     if (item) {
       setSelected(item);
       setForm(item);
@@ -57,8 +59,9 @@ export const EditaisPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = async (e: React.SubmitEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
     try {
       if (selected?.id) {
         await api.put(`/edital/${selected.id}`, form);
@@ -67,8 +70,15 @@ export const EditaisPage: React.FC = () => {
       }
       setModalOpen(false);
       carregarEditais();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar edital:', err);
+      const response = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: unknown } }).response
+        : undefined;
+      const detail = response?.data && typeof response.data === 'object'
+        ? JSON.stringify((response.data as { detail?: unknown }).detail ?? response.data)
+        : null;
+      setSubmitError(detail || 'Erro ao salvar edital. Verifique os campos preenchidos.');
     }
   };
 
@@ -152,6 +162,12 @@ export const EditaisPage: React.FC = () => {
             <h2 className="text-xl font-bold" style={{ color: colors.textDark }}>
               {selected ? 'Editar Edital' : 'Criar Edital'}
             </h2>
+
+            {submitError && (
+              <div className="p-3 text-xs text-white rounded" style={{ backgroundColor: colors.red }}>
+                {submitError}
+              </div>
+            )}
 
             <form onSubmit={handleSave} className="space-y-3">
               <div>

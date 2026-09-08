@@ -9,6 +9,7 @@ export const NoticiasPage: React.FC = () => {
   const [selected, setSelected] = useState<Noticia | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const [form, setForm] = useState<Noticia>({
     titulo: '',
@@ -56,7 +57,6 @@ export const NoticiasPage: React.FC = () => {
     }
   }, []);
 
-  // Efeito isolado sem chamadas de setState síncronas diretamente na raiz do Effect
   useEffect(() => {
     let active = true;
 
@@ -109,6 +109,7 @@ export const NoticiasPage: React.FC = () => {
   }, []);
 
   const handleOpenModal = (item?: Noticia) => {
+    setSubmitError('');
     if (item) {
       setSelected(item);
       setForm({
@@ -131,6 +132,7 @@ export const NoticiasPage: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
     try {
       if (selected?.id) {
         await api.put(`/noticia/${selected.id}`, form);
@@ -139,8 +141,15 @@ export const NoticiasPage: React.FC = () => {
       }
       setModalOpen(false);
       carregarNoticias();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar notícia:', err);
+      const response = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: unknown } }).response
+        : undefined;
+      const detail = response?.data && typeof response.data === 'object'
+        ? JSON.stringify((response.data as { detail?: unknown }).detail ?? response.data)
+        : null;
+      setSubmitError(detail || 'Erro ao salvar notícia. Verifique os campos preenchidos.');
     }
   };
 
@@ -237,13 +246,18 @@ export const NoticiasPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-xl w-full p-6 space-y-4 shadow-xl">
             <h2 className="text-xl font-bold" style={{ color: colors.textDark }}>
               {selected ? 'Editar Notícia' : 'Criar Notícia'}
             </h2>
+
+            {submitError && (
+              <div className="p-3 text-xs text-white rounded" style={{ backgroundColor: colors.red }}>
+                {submitError}
+              </div>
+            )}
 
             <form onSubmit={handleSave} className="space-y-3">
               <div>

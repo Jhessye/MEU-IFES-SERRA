@@ -9,6 +9,7 @@ export const OportunidadesPage: React.FC = () => {
   const [selected, setSelected] = useState<Oportunidade | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const [form, setForm] = useState<Oportunidade>({
     titulo: '',
@@ -65,6 +66,7 @@ export const OportunidadesPage: React.FC = () => {
   }, []);
 
   const handleOpenModal = (item?: Oportunidade) => {
+    setSubmitError('');
     if (item) {
       setSelected(item);
       setForm(item);
@@ -82,8 +84,9 @@ export const OportunidadesPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = async (e: React.SyntheticEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
     try {
       if (selected?.id) {
         await api.put(`/oportunidade/${selected.id}`, form);
@@ -92,8 +95,15 @@ export const OportunidadesPage: React.FC = () => {
       }
       setModalOpen(false);
       carregarOportunidades();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erro ao salvar oportunidade:', err);
+      const response = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: unknown } }).response
+        : undefined;
+      const detail = response?.data && typeof response.data === 'object'
+        ? JSON.stringify((response.data as { detail?: unknown }).detail ?? response.data)
+        : null;
+      setSubmitError(detail || 'Erro ao salvar oportunidade. Verifique os campos preenchidos.');
     }
   };
 
@@ -196,6 +206,12 @@ export const OportunidadesPage: React.FC = () => {
             <h2 className="text-xl font-bold" style={{ color: colors.textDark }}>
               {selected ? 'Editar Oportunidade' : 'Criar Oportunidade'}
             </h2>
+
+            {submitError && (
+              <div className="p-3 text-xs text-white rounded" style={{ backgroundColor: colors.red }}>
+                {submitError}
+              </div>
+            )}
 
             <form onSubmit={handleSave} className="space-y-3">
               <div>
