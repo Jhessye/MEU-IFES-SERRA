@@ -7,9 +7,5 @@ Um aplicativo para celular que vai ajudar na integração dos alunos às notíci
 /pages # Páginas do módulo admin
 /mobile # Aplicativo 
 /infra # Infraestrutura (Banco de dados, etc)
-docker-compose.yaml 
-/.github
-.gitignore
-README.md
 ```
 
